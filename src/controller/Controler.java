@@ -190,6 +190,7 @@ public class Controler {
 	}
 	
 	private void mainLoop(boolean initLeft) {
+		
 		boolean run = true;
 		boolean pasDeProbleme = true;
 		ArrayList<String> goals = new ArrayList<>();
