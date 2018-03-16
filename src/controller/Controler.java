@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+import camera.Camera;
 import motors.Graber;
 import motors.TImedMotor;
 import motors.Propulsion;
@@ -33,6 +34,7 @@ public class Controler {
 	protected VisionSensor vision = null;
 	protected Screen screen = null;
 	protected InputHandler input = null;
+	protected Camera camera = null;
 	private boolean seekLeft;
 
 	enum State {
@@ -41,13 +43,14 @@ public class Controler {
 
 	private ArrayList<TImedMotor> motors = new ArrayList<TImedMotor>();
 
-	public Controler() {
+	public Controler(Camera cam) {
 		propulsion = new Propulsion();
 		graber = new Graber();
 		color = new ColorSensor();
 		pression = new PressionSensor();
 		vision = new VisionSensor();
 		screen = new Screen();
+		camera = cam;
 		input = new InputHandler(screen);
 		motors.add(propulsion);
 		motors.add(graber);
@@ -153,8 +156,8 @@ public class Controler {
 	private static ArrayList<String> findGoals() {
 		Solver s = new Solver(); 
 		
-		// Récuperation des points
-		//...
+		// Rï¿½cuperation des points
+		// camera.get ...
 		// Pour l'instant statics
 		IntPoint marvin = new IntPoint(0, 0);
 		ArrayList<IntPoint> listPalets = new ArrayList<>();
@@ -176,10 +179,10 @@ public class Controler {
 			m.checkState();
 		switch (action[0]) {
 		case "prendrePalet":
-			// avance jusqu'à toucher le palet
+			// avance jusqu'ï¿½ toucher le palet
 			propulsion.runFor(R2D2Constants.MAX_GRABING_TIME, true);
 			while (vision.getRaw()[0] > R2D2Constants.COLLISION_DISTANCE && !pression.isPressed()) {
-				// si pas trouvé de palet après un certain temps, sort
+				// si pas trouvï¿½ de palet aprï¿½s un certain temps, sort
 				if (!propulsion.isRunning() || input.escapePressed())
 					return false;
 				propulsion.checkState();
@@ -202,7 +205,7 @@ public class Controler {
 			// attend la fin de l'ouverture des pinces
 			while (graber.isRunning())
 				;
-			// recule après avoir lacher le palet
+			// recule aprï¿½s avoir lacher le palet
 			propulsion.runFor(R2D2Constants.EMPTY_HANDED_STEP_FORWARD, false);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
@@ -220,7 +223,7 @@ public class Controler {
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
-			// déplacement
+			// dï¿½placement
 			propulsion.runFor(R2D2Constants.THREE_QUARTER_S, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
@@ -237,7 +240,7 @@ public class Controler {
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
-			// déplacement
+			// dï¿½placement
 			propulsion.runFor(R2D2Constants.THREE_QUARTER_S, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
@@ -255,7 +258,7 @@ public class Controler {
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
-			// déplacement
+			// dï¿½placement
 			propulsion.runFor(R2D2Constants.THREE_QUARTER_S, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
@@ -273,7 +276,7 @@ public class Controler {
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
-			// déplacement
+			// dï¿½placement
 			propulsion.runFor(R2D2Constants.THREE_QUARTER_S, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();

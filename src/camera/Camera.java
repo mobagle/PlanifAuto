@@ -6,7 +6,7 @@ public class Camera {
 
 	private final ArrayList<IntPoint>			masterList;
 
-	Camera() {
+	public Camera() {
 		masterList = new ArrayList<IntPoint>();
 	}
 	

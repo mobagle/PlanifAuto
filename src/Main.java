@@ -1,3 +1,5 @@
+import camera.Camera;
+import camera.Server;
 import controller.Controler;
 
 import lejos.utility.Delay;
@@ -5,7 +7,14 @@ import lejos.utility.Delay;
 public class Main {
 
 	public static void main(String[] args) {
-		Controler controler = new Controler();
+		Camera cam = new Camera();
+		
+		// Lancement de la camera
+		Server s = new Server(cam);
+		s.start();
+		
+		//Lancement de la Brique
+		Controler controler = new Controler(cam);
 		try{
 			controler.start();
 		}catch(Throwable e){
