@@ -20,7 +20,7 @@ import fr.uga.pddl4j.planners.hsp.HSP;
 public class ProblemWriter {
 	Path path = FileSystems.getDefault().getPath(".");
 	
-	public String filename = new File("src/solver/pddlfiles/default.pddl").getAbsolutePath();
+	public String filename = new File("default.pddl").getAbsolutePath();
 
 	/* Ecriture du probleme à résoudre
 	 * 	Au format pddl
