@@ -18,8 +18,8 @@ import sensors.PressionSensor;
 import sensors.VisionSensor;
 import vue.InputHandler;
 import vue.Screen;
-import utils.IntPoint;
-import utils.ProblemWriter;
+import solver.IntPoint;
+import solver.Solver;
 import utils.R2D2Constants;
 import lejos.hardware.Button;
 import lejos.robotics.Color;
@@ -150,17 +150,21 @@ public class Controler {
 	/**
 	 * Lance pdll pour trouver les actions Ã  effectuer
 	 */
-	private ArrayList<String> findGoals() {
-		ProblemWriter pw = new ProblemWriter(); // changer file name
-
+	private static ArrayList<String> findGoals() {
+		Solver s = new Solver(); 
+		
+		// Récuperation des points
+		//...
+		// Pour l'instant statics
 		IntPoint marvin = new IntPoint(0, 0);
 		ArrayList<IntPoint> listPalets = new ArrayList<>();
-		for (int i = 3; i < 10; i = i + 3)
-			for (int j = 3; j < 10; j = j + 3)
+		for(int i=3; i<10; i=i+3)
+			for(int j=3; j<10; j=j+3)
 				listPalets.add(new IntPoint(i, j));
+		//listPalets.add(new IntPoint(3, 3));
 
-		ArrayList<String> actions = pw.findActions(marvin, null, listPalets);
-		return actions;
+		// Recherche des action a effectuer
+		return s.findActions(marvin, null, listPalets);
 	}
 
 	private boolean execute(String ac) {
@@ -284,6 +288,8 @@ public class Controler {
 	}
 
 	private void mainLoop() {
+		
+		/*
 		propulsion.runFor(R2D2Constants.HALF_SECOND, true);
 		while(propulsion.isRunning()){
 			propulsion.checkState();
@@ -323,7 +329,7 @@ public class Controler {
 			propulsion.checkState();
 		}
 		
-		/*
+		*/
 		boolean run = true;
 		boolean pasDeProbleme = true;
 		ArrayList<String> goals = new ArrayList<>();
@@ -342,7 +348,7 @@ public class Controler {
 				run = false;
 			}	
 		}
-		*/
+		
 	}
 
 	/**
