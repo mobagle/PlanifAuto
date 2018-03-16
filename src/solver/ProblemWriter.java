@@ -16,6 +16,7 @@ import org.json.simple.parser.ParseException;
 */
 
 import fr.uga.pddl4j.planners.hsp.HSP;
+import utils.IntPoint;
 
 public class ProblemWriter {
 	Path path = FileSystems.getDefault().getPath(".");

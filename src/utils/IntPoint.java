@@ -1,4 +1,4 @@
-package solver;
+package utils;
 
 /**
  * Classe representant un point ayant des coordonn�es enti�re dans un rep�re cart�sien.

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import fr.uga.pddl4j.planners.hsp.HSP;
+import utils.IntPoint;
 
 public class Solver {
 	
@@ -28,9 +29,13 @@ public class Solver {
 		}
 
 		// Recuperation des actions
+		/*
 		Jsonparser jspars = new Jsonparser();		
 		ArrayList<String> actions = jspars.getActions(plan);
-		
+		*/
+		Parser pars = new Parser();
+		ArrayList<String> actions = pars.getActions(plan);
+
 		return actions;
 	}
 
