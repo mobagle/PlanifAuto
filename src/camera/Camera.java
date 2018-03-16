@@ -2,6 +2,8 @@ package camera;
 
 import java.util.ArrayList;
 
+import utils.IntPoint;
+
 public class Camera {
 
 	private final ArrayList<IntPoint>			masterList;

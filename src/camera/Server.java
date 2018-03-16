@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import utils.IntPoint;
+
 public class Server extends Thread{
 	
 	/**
