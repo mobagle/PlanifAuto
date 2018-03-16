@@ -36,7 +36,6 @@ public class Solver {
 
 	/* Lance le probleme avec pddl4j */
     public String testHSPplan() throws Exception {
-    	/*
         String[] args = new String[6];
         new File("domain.pddl");
         args[0] = "-o";
@@ -45,9 +44,7 @@ public class Solver {
         args[3] = positionFiles+"default.pddl";
         args[4] = "-t";
         args[5] = "10";
-        return HSP.resolveAsJsonPlan(args);
-        */
-        return "";
+        return HSP.resolve(args);
     }
     
 }
