@@ -2,10 +2,14 @@ package solver;
 
 import java.util.ArrayList;
 
+import vue.Screen;
+
 public class Parser {
 
 	/* Fonction principale, transforme le String (Json) en ArrayList d'actions à effectuer */
 	public ArrayList<String> getActions(String plan) {
+		Screen screen = new Screen();
+		screen.drawText("PLAN : "+plan);
 		// Tableau avec toutes les actions
 		String[] tab = getTabActions(plan);
 		
@@ -29,7 +33,9 @@ public class Parser {
 	 * Cree un tableau d'action en fonction du string plan retourné par pddl 
 	 */
 	public String[] getTabActions(String plan) {
-		return null;
+		String[] s = new String[1];
+		s[0] = plan;
+		return s;
 	}
 	
 	/* Remet dans l'ordre des actions à effectuer par le robot */
