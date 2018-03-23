@@ -170,7 +170,7 @@ public class Controler {
 		return s.findActions(marvin, null, listPalets);
 	}
 
-	private boolean execute(String ac) {
+	private boolean executeold(String ac) {
 		// X largeur du terrain, Y longueur
 		System.out.println(ac);
 		String action[] = ac.split(" ");
@@ -289,50 +289,78 @@ public class Controler {
 			return false;
 		}
 	}
+	
+	private boolean execute(String ac) {
+		// X largeur du terrain, Y longueur
+		System.out.println(ac);
+		String action[] = ac.split(" ");
+		int x0, x1, y0, y1, distance;
+		for (TImedMotor m : motors)
+			m.checkState();
+		switch (action[0]) {
+		case "prendrePalet":
+			// avance jusqu'� toucher le palet
+			propulsion.runFor(R2D2Constants.MAX_GRABING_TIME, true);
+			while (vision.getRaw()[0] > R2D2Constants.COLLISION_DISTANCE && !pression.isPressed()) {
+				// si pas trouv� de palet apr�s un certain temps, sort
+				if (!propulsion.isRunning() || input.escapePressed())
+					return false;
+				propulsion.checkState();
+			}
+			// arret des roues
+			propulsion.stopMoving();
+			// ferme les pince
+			graber.close();
+			// attend la fin de la fermeture des pinces
+			while (graber.isRunning()) {
+				graber.checkState();
+				if (input.escapePressed())
+					return false;
+			}
+			return true;
+
+		case "lacherPalet":
+			// ouvre les pinces
+			graber.open();
+			// attend la fin de l'ouverture des pinces
+			while (graber.isRunning())
+				;
+			// recule apr�s avoir lacher le palet
+			propulsion.runFor(R2D2Constants.EMPTY_HANDED_STEP_FORWARD, false);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+				if (input.escapePressed())
+					return false;
+			}
+			return true;
+
+		case "deplacement": // vers un x plus grand
+			x0 = Integer.valueOf(action[1]);
+			x1 = Integer.valueOf(action[2]);
+			y0 = Integer.valueOf(action[3]);
+			y1 = Integer.valueOf(action[4]);
+			
+			// rotation
+			double myOrientation = propulsion.getOrientation();
+			double angleFromNorth = Math.atan2(y1 - y0, x1 - x0) - Math.atan2(12 - y0, x0 - x0);
+			Double rotation =  angleFromNorth - myOrientation;
+			System.out.println("myOrientation: "+myOrientation+" | angleFromNorth: "+angleFromNorth+" | rotation: "+rotation);
+			
+			propulsion.rotate(rotation.intValue(), true, R2D2Constants.ANGLE_CORRECTION);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+			}
+
+			return true;
+
+		default:
+			return false;
+		}
+	}
+
 
 	private void mainLoop() {
 		
-		/*
-		propulsion.runFor(R2D2Constants.HALF_SECOND, true);
-		while(propulsion.isRunning()){
-			propulsion.checkState();
-		}
-		//propulsion.orientateNorth();
-		propulsion.halfTurn(false);
-		while(propulsion.isRunning()){
-			propulsion.checkState();
-		}
-		
-		propulsion.runFor(R2D2Constants.HALF_SECOND, true);
-		while(propulsion.isRunning()){
-			propulsion.checkState();
-		}
-		//propulsion.orientateEast();
-		propulsion.halfTurn(false);
-		while(propulsion.isRunning()){
-			propulsion.checkState();
-		}
-		
-		propulsion.runFor(R2D2Constants.HALF_SECOND, true);
-		while(propulsion.isRunning()){
-			propulsion.checkState();
-		}
-		//propulsion.orientateSouth(false);
-		propulsion.halfTurn(false);
-		while(propulsion.isRunning()){
-			propulsion.checkState();
-		}
-		
-		propulsion.runFor(R2D2Constants.HALF_SECOND, true);
-		while(propulsion.isRunning()){
-			propulsion.checkState();
-		}
-		propulsion.halfTurn(false);
-		while(propulsion.isRunning()){
-			propulsion.checkState();
-		}
-		
-		*/
 		boolean run = true;
 		boolean pasDeProbleme = true;
 		ArrayList<String> goals = new ArrayList<>();
