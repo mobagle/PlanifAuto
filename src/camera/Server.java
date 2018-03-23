@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import controller.Controler;
 import utils.IntPoint;
 
 public class Server extends Thread{
@@ -60,7 +61,6 @@ public class Server extends Thread{
 		this.camera 				= c;
 		this.packet 			= new DatagramPacket(this.buffer, this.buffer.length);
 		this.lastPointsReceived	= new ArrayList<IntPoint>();
-		
 		try {
 			this.dsocket = new DatagramSocket(PORT);
 		} catch (SocketException e1) {
@@ -76,16 +76,23 @@ public class Server extends Thread{
 	 */
 	@Override
 	public void run() {
+		System.out.println("[SERVER]                : Started");
 		//Main.printf("[SERVER]                : Started");
 		this.setPriority(Thread.NORM_PRIORITY);
-		while(! isInterrupted() && !this.stop){
+		//while(! isInterrupted() && !this.stop){
+			System.out.println("[SERVER]                : WHILE");
 			try {
+				System.out.println("[SERVER]                : WAIT");
+
 				this.dsocket.receive(this.packet);
-				//this.lastReceivedTimer = Main.TIMER.getElapsedMs();
+				System.out.println("[SERVER]                : OK");
+
 			} catch (IOException e) {
-				//Main.printf("[SERVER]                : Socket Closed");
+				System.out.println("[SERVER]                : Socket Closed");
 				this.stop = true;
 			}
+			System.out.println("[SERVER]                : RCV");
+
 			String msg = new String(this.buffer, 0, this.packet.getLength());
 			String[] items = msg.split("\n");
 			this.lastPointsReceived.clear();
@@ -93,17 +100,45 @@ public class Server extends Thread{
 	        {
 				String[] coord = items[i].split(";");
 				if(coord.length == 3){
+					System.out.println(coord[0]+coord[1]+coord[2]);
 		        	int x = Integer.parseInt(coord[1]);
-		        	int y = 300 - Integer.parseInt(coord[2]); // convertion en mode 'genius'
-		        	this.lastPointsReceived.add(new IntPoint(x, y));		        	
+		        	int y = Integer.parseInt(coord[2]);
+		        	
+		        	IntPoint p = this.traductionPoint(new IntPoint(x, y));
+		        	System.out.println(p);
+		        	this.lastPointsReceived.add(p);
 				}
 	        }
 			this.camera.receiveRawPoints(this.lastReceivedTimer,this.lastPointsReceived);
 			this.packet.setLength(this.buffer.length);
-		}
-		//Main.printf("[SERVER]                : Finished");
+		//}
+		System.out.println("[SERVER]                : Finished");
 	}
 	
+	private IntPoint traductionPoint(IntPoint intPoint) {
+		if (Controler.seekLeft) {
+			return traductionPointLeft(intPoint);
+		} else {
+			return traductionPointRight(intPoint);
+		}
+	}
+
+	private IntPoint traductionPointRight(IntPoint intPoint) {
+		int x = intPoint.getX();
+		int y = intPoint.getY();
+		int newX = (int)(Math.abs(200-x)/50)*3;
+		int newY = (int)(x/50)*3;
+		return new IntPoint(newX, newY);
+	}
+
+	private IntPoint traductionPointLeft(IntPoint intPoint) {
+		int x = intPoint.getX();
+		int y = intPoint.getY();
+		int newX = (int)(x/50)*3;
+		int newY = (int)(x/50)*3;
+		return new IntPoint(newX, newY);
+	}
+
 	@Override
 	public void interrupt(){
 		this.dsocket.close();

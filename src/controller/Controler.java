@@ -35,7 +35,7 @@ public class Controler {
 	protected Screen screen = null;
 	protected InputHandler input = null;
 	protected Camera camera = null;
-	private boolean seekLeft;
+	public static boolean seekLeft;
 
 	enum State {
 		toThePalet, toTheHome

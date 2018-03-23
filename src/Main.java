@@ -12,7 +12,8 @@ public class Main {
 		// Lancement de la camera
 		Server s = new Server(cam);
 		s.start();
-		
+		System.out.println("END");
+		/*
 		//Lancement de la Brique
 		Controler controler = new Controler(cam);
 		try{
@@ -20,7 +21,7 @@ public class Main {
 		}catch(Throwable e){
 			e.printStackTrace();
 			Delay.msDelay(10000);
-		}
+		}*/
 		System.exit(0);
 	}
 

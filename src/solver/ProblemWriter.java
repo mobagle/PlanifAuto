@@ -157,8 +157,8 @@ public class ProblemWriter {
     		"(define (problem hanoi-tower)\n" + 
 			"    (:domain hanoi)\n" + 
 			"    (:objects\n" + 
-			"        x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 - posX\n" + 
-			"        y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 - posY)\n" + 
+			"        x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12- posX\n" + 
+			"        y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12- posY)\n" + 
 			"    (:init         \n" + 
 			"        (depX x0 x1) (depY y0 y1)\n" + 
 			"        (depX x1 x2) (depY y1 y2)\n" + 
@@ -171,19 +171,21 @@ public class ProblemWriter {
 			"        (depX x8 x9) (depY y8 y9)\n" + 
 			"        (depX x9 x10) (depY y9 y10)\n" + 
 			"        (depX x10 x11) (depY y10 y11)" +
+			"		 (depX x11 x12) (depY y12 y12)" +
 			"\n" + 
-			"        (peut-lacher x0 y11)\n" + 
-			"        (peut-lacher x1 y11)\n" + 
-			"        (peut-lacher x2 y11)\n" + 
-			"        (peut-lacher x3 y11)\n" + 
-			"        (peut-lacher x4 y11)\n" + 
-			"        (peut-lacher x5 y11)\n" + 
-			"        (peut-lacher x6 y11)\n" + 
-			"        (peut-lacher x7 y11)\n" + 
-			"        (peut-lacher x8 y11)\n" + 
-			"        (peut-lacher x9 y11)\n" + 
-			"        (peut-lacher x10 y11)\n" + 
-			"        (peut-lacher x11 y11)\n" +
+			"        (peut-lacher x0 y12)\n" + 
+			"        (peut-lacher x1 y12)\n" + 
+			"        (peut-lacher x2 y12)\n" + 
+			"        (peut-lacher x3 y12)\n" + 
+			"        (peut-lacher x4 y12)\n" + 
+			"        (peut-lacher x5 y12)\n" + 
+			"        (peut-lacher x6 y12)\n" + 
+			"        (peut-lacher x7 y12)\n" + 
+			"        (peut-lacher x8 y12)\n" + 
+			"        (peut-lacher x9 y12)\n" + 
+			"        (peut-lacher x10 y12)\n" + 
+			"        (peut-lacher x11 y12)\n" +
+			"        (peut-lacher x12 y12)\n" +
 			"        \n";
     
 }
