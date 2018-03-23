@@ -31,7 +31,7 @@ public class ProblemWriter {
 			
 			FileWriter fichier = new FileWriter(filename);
 			// Contenu fixe du domaine
-			String contenu = domaine3;
+			String contenu = domaine2;
 			
 			// Position de départ robot
 			contenu = contenu +	"        (is-on x"+departRobot.getX()+" y"+departRobot.getY()+")\n";
@@ -170,9 +170,8 @@ public class ProblemWriter {
 			"        (depX x7 x8) (depY y7 y8)\n" + 
 			"        (depX x8 x9) (depY y8 y9)\n" + 
 			"        (depX x9 x10) (depY y9 y10)\n" + 
-			"        (depX x10 x11) (depY y10 y11)" +
-			"		 (depX x11 x12) (depY y12 y12)" +
-			"\n" + 
+			"        (depX x10 x11) (depY y10 y11)\n" +
+			"		 (depX x11 x12) (depY y11 y12)\n" +
 			"        (peut-lacher x0 y12)\n" + 
 			"        (peut-lacher x1 y12)\n" + 
 			"        (peut-lacher x2 y12)\n" + 
