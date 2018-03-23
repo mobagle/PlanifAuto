@@ -17,9 +17,7 @@ public class Camera {
 	 *******************************************************/
 
 	synchronized private void cleanHashMap() {
-		for(IntPoint tp : masterList){
-			masterList.remove(tp);
-		}
+		masterList.clear();
 	}
 	
 	synchronized public void receiveRawPoints(final int timeout, final ArrayList<IntPoint> PointsList) {

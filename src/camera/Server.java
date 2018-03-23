@@ -64,11 +64,11 @@ public class Server extends Thread{
 		try {
 			this.dsocket = new DatagramSocket(PORT);
 		} catch (SocketException e1) {
-			//Main.printf("[SERVER]                : Erreur, DatagramSocket non initialisé");
+			System.out.println("[SERVER]                : Erreur, DatagramSocket non initialisé");
 			e1.printStackTrace();
 		}
 		
-		//Main.printf("[SERVER]                : Initialized");
+		System.out.println("[SERVER]                : Initialized");
 	}
 			
 	/**
@@ -77,13 +77,11 @@ public class Server extends Thread{
 	@Override
 	public void run() {
 		System.out.println("[SERVER]                : Started");
-		//Main.printf("[SERVER]                : Started");
 		this.setPriority(Thread.NORM_PRIORITY);
-		//while(! isInterrupted() && !this.stop){
+		while(! isInterrupted() && !this.stop){
 			System.out.println("[SERVER]                : WHILE");
 			try {
 				System.out.println("[SERVER]                : WAIT");
-
 				this.dsocket.receive(this.packet);
 				System.out.println("[SERVER]                : OK");
 
@@ -111,7 +109,7 @@ public class Server extends Thread{
 	        }
 			this.camera.receiveRawPoints(this.lastReceivedTimer,this.lastPointsReceived);
 			this.packet.setLength(this.buffer.length);
-		//}
+		}
 		System.out.println("[SERVER]                : Finished");
 	}
 	
