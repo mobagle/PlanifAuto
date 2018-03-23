@@ -42,13 +42,12 @@ public class Solver {
 	/* Lance le probleme avec pddl4j */
     public String testHSPplan() throws Exception {
         String[] args = new String[6];
-        new File("domain.pddl");
         args[0] = "-o";
-        args[1] =  "domain.pddl";
+        args[1] =  "./domain.pddl";
         args[2] = "-f";
-        args[3] = "default.pddl";
-        //args[4] = "-t";
-        //args[5] = "10";
+        args[3] = "./default.pddl";
+        args[4] = "-t";
+        args[5] = "10";
         return HSP.resolve(args);
     }
     
