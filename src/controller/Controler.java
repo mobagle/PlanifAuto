@@ -389,10 +389,10 @@ public class Controler {
 			// rotation
 
 			int degrees = angle(myPos, dest, north);
-			System.out.println("angle calcul: " + degrees);
+			System.out.println("computed angle: " + degrees);
 			
 			int myOrientation = (int)propulsion.getRotateToNorth();
-			System.out.println("mon orientation: " + myOrientation);
+			System.out.println("my orientation: " + myOrientation);
 			
 			int angle = degrees - myOrientation;
 			System.out.println("angle corrected: " + angle);
@@ -409,7 +409,7 @@ public class Controler {
 		}
 	}
 
-	/** retourne la distance absolue entreles points p1 et p2 */
+	/** retourne la distance absolue entre les points p1 et p2 */
 	private double distance(IntPoint p1, IntPoint p2) {
 		return Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2));
 	}
@@ -420,8 +420,8 @@ public class Controler {
 		double ac = distance(p1, p3);
 		double bc = distance(p3, p2);
 		double rad = Math.acos(((Math.pow(ab, 2) + Math.pow(ac, 2) - Math.pow(bc, 2)) / (2 * ab * ac)));
-		Double degree = (rad * 180) / Math.PI;
-		return degree.intValue();
+		double degree = (rad * 180) / Math.PI;
+		return (int) Math.round(degree);
 	}
 
 	private void mainLoop() {
@@ -430,7 +430,7 @@ public class Controler {
 		boolean pasDeProbleme = true;
 		ArrayList<String> goals = new ArrayList<>();
 		String goal;
-
+		/*
 		goals.add("deplacement 0 2 0 3");
 		goals.add("prendrePalet");
 		goals.add("deplacement 2 0 3 0");
@@ -439,7 +439,8 @@ public class Controler {
 		goals.add("prendrePalet");
 		goals.add("deplacement 0 0 3 0");
 		goals.add("lacherPalet");
-
+		*/
+		goals = findGoals();
 		ListIterator<String> li = goals.listIterator();
 		while (li.hasNext() && pasDeProbleme) {
 			goal = li.next();
@@ -448,7 +449,7 @@ public class Controler {
 			}
 		}
 
-		/**
+		/*
 		 * real loop after while(run){ goals = findGoals(); if(goals != null){
 		 * ListIterator<String> li = goals.listIterator(); while (li.hasNext() &&
 		 * pasDeProbleme) { goal = li.next(); if(goal != null){ pasDeProbleme =
