@@ -33,6 +33,7 @@ public class Parser {
 	 * Cree un tableau d'action en fonction du string plan retourné par pddl 
 	 */
 	public String[] getTabActions(String plan) {
+		System.out.println(plan);
 		String[] s = new String[1];
 		s[0] = plan;
 		return s;

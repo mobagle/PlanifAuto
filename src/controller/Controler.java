@@ -414,7 +414,7 @@ public class Controler {
 		return Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2));
 	}
 
-	/** retourne l'angle en degrees en p1 formé par les points p2 et p3*/
+	/** retourne l'angle en degrees en p1 formï¿½ par les points p2 et p3*/
 	private int angle(IntPoint p1, IntPoint p2, IntPoint p3) {
 		double ab = distance(p1, p2);
 		double ac = distance(p1, p3);
@@ -445,7 +445,7 @@ public class Controler {
 		while (li.hasNext() && pasDeProbleme) {
 			goal = li.next();
 			if (goal != null) {
-				pasDeProbleme = execute(goal);
+				//pasDeProbleme = execute(goal);
 			}
 		}
 
