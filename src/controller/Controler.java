@@ -77,11 +77,13 @@ public class Controler {
 		loadCalibration();
 
 		screen.drawText("Calibration", "Appuyez sur echap ", "pour skipper");
-		boolean skip = input.waitOkEscape(Button.ID_ESCAPE);
+		boolean skip = true;//input.waitOkEscape(Button.ID_ESCAPE);
 		if (skip || calibration()) {
 			if (!skip) {
 				saveCalibration();
 			}
+			seekLeft = true;
+
 			screen.drawText("Lancer", "Appuyez sur OK si la", "ligne noire est à gauche", "Appuyez sur tout autre",
 					"elle est à droite");
 			if (input.isThisButtonPressed(input.waitAny(), Button.ID_ENTER)) {
@@ -90,14 +92,17 @@ public class Controler {
 			} else {
 				seekLeft = false;
 			}
+			seekLeft = false;
 			mainLoop();
 		}
 
+		/*
 		// my code
-		// seekLeft = true;
-		// mainLoop();
+		seekLeft = true;
+		mainLoop();
 		// end my code
-
+		*/
+		
 		cleanUp();
 	}
 
@@ -440,13 +445,17 @@ public class Controler {
 		goals.add("deplacement 0 0 3 0");
 		goals.add("lacherPalet");
 		*/
-		goals = findGoals();
-		ListIterator<String> li = goals.listIterator();
-		while (li.hasNext() && pasDeProbleme) {
-			goal = li.next();
-			if (goal != null) {
-				//pasDeProbleme = execute(goal);
+		while (run) {
+			goals = findGoals();
+			ListIterator<String> li = goals.listIterator();
+			while (li.hasNext() && pasDeProbleme) {
+				goal = li.next();
+				System.out.println("ACTION : "+goal);
+				if (goal != null) {
+					pasDeProbleme = execute(goal);
+				}
 			}
+			run = false;
 		}
 
 		/*

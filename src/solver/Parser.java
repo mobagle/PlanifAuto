@@ -10,19 +10,21 @@ public class Parser {
 	public ArrayList<String> getActions(String plan) {
 		// Tableau avec toutes les actions
 		String[] tab = getTabActions(plan);
-
+		
 		// Suppression des actions identiques à la suite
 		simplifier(tab);
 		
 		// Supprime les déplacements en angles droits
 		raccourcie(tab);
 		
+		// Si deux actions "deplacement" sont à la suite, elles sont fusionnées
+		deplacementx2(tab);
+		
 		// Remplissage de l'ArrayList des actions
 		ArrayList<String> resultat = new ArrayList<String>();
 		for(int i = 0; i<tab.length; i++) {
 			if (tab[i] != null) {
 				resultat.add(tab[i]);
-				System.out.println("tab[i] fin : "+tab[i]);
 			}
 		}
 		return resultat;
@@ -36,8 +38,8 @@ public class Parser {
 		String[] s = new String[acts.length];
 		for(int i=0;i<acts.length;i++) {
 			String[] act = acts[i].split(" ");
-			String action = "";
-			for (int j=0;j<act.length;j++) {
+			String action = act[0];
+			for (int j=1;j<act.length;j++) {
 				if (act[j].charAt(0) == 'x' || act[j].charAt(0) == 'y') {
 					action = action+" "+act[j].substring(1);
 				} else {
@@ -77,7 +79,7 @@ public class Parser {
 		for(int i = 0; i<size-1; i++) {
 			String action1 = getPremierMot(tab[i]);
 			String action2 = getPremierMot(tab[i+1]);
-			if (action1 != null && action1.equals(action2)) {
+			if (action1 != null && action1 != "" && action1.equals(action2)) {
 				String[] actionTab1 = tab[i].split(" ");
 				String[] actionTab2 = tab[i+1].split(" ");
 				String newAction = actionTab1[0]+" "+actionTab1[1]+" "+actionTab2[2]+" "+actionTab1[3];
@@ -89,6 +91,26 @@ public class Parser {
 	}
 
 	/* Modifie les actions
+	 * Si il y a un deplacement a la suite
+	 */
+	private void deplacementx2(String[] tab) {
+		int size = tab.length;
+		for(int i = 0; i<size-1; i++) {
+			if (tab[i] != null) {
+				String action1 = getPremierMot(tab[i]);
+				String action2 = getPremierMot(tab[i+1]);
+				if (action1.equals("deplacement") && action2.equals("deplacement")) {
+					String[] actionTab1 = tab[i].split(" ");
+					String[] actionTab2 = tab[i+1].split(" ");
+					String newAction = "deplacement "+actionTab1[1]+" "+actionTab1[2]+" "+actionTab2[3]+" "+actionTab2[4];
+					tab[i] = newAction;
+					suppr(i+1, tab);
+					i--;
+				}
+			}
+		}
+	}
+	/* Modifie les actions
 	 * Si il y a un deplacement sur Y suivi d'un deplacement sur Y (resp. Y puis sur X)
 	 * C'est des actions sont supprimés et remplacé par une action de deplacement d'un point A à un point B
 	 * Tel que : A.X != B.X && A.Y != B.Y
@@ -96,24 +118,35 @@ public class Parser {
 	private void raccourcie(String[] tab) {
 		int size = tab.length;
 		for(int i = 0; i<size-1; i++) {
-			String action1 = getPremierMot(tab[i]);
-			String action2 = getPremierMot(tab[i+1]);
-			int res = actionsCorrespondantes(action1, action2);
-			if (res > 0) {
-				String[] actionTab1 = tab[i].split(" ");
-				String[] actionTab2 = tab[i+1].split(" ");
+			if (tab[i] != null) {
+				String action1 = getPremierMot(tab[i]);
+				String action2 = getPremierMot(tab[i+1]);
 				String newAction = "deplacement ";
-				if (res == 1) {
-					newAction += actionTab1[1]+" "+actionTab2[1]+" "+actionTab1[2]+" "+actionTab2[2];
-				} else if(res == 2) {
-					newAction += actionTab2[1]+" "+actionTab1[1]+" "+actionTab2[2]+" "+actionTab1[2];
+				int res = actionsCorrespondantes(action1, action2);
+				if (res > 0) {
+					String[] actionTab1 = tab[i].split(" ");
+					String[] actionTab2 = tab[i+1].split(" ");
+					if (res == 1) {
+						newAction += actionTab1[1]+" "+actionTab2[1]+" "+actionTab1[2]+" "+actionTab2[2];
+					} else if(res == 2) {
+						newAction += actionTab2[1]+" "+actionTab1[1]+" "+actionTab2[2]+" "+actionTab1[2];
+					} else {
+						System.out.println("ERREUR valeur de 'res' dans raccourcie");
+					}
+					tab[i] = newAction;
+					suppr(i+1, tab);
+					i--;
+				} else if (action1.equals("deplacementx1") || action1.equals("deplacementx2")) {
+					String[] actionTab = tab[i].split(" ");
+					newAction += actionTab[1]+" "+actionTab[3]+" "+actionTab[2]+" "+actionTab[3];
+					tab[i] = newAction;
+				} else if (action1.equals("deplacementy1") || action1.equals("deplacementy2")) {
+					String[] actionTab = tab[i].split(" ");
+					newAction += actionTab[3]+" "+actionTab[1]+" "+actionTab[3]+" "+actionTab[2];
+					tab[i] = newAction;
 				} else {
-					System.out.println("ERREUR valeur de 'res' dans raccourcie");
+					//System.out.println("No racourcie \""+tab[i]+"\"");
 				}
-				//System.out.println("newAction ="+newAction);
-				tab[i] = newAction;
-				suppr(i+1, tab);
-				i--;
 			}
 		}
 	}
