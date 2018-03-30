@@ -40,9 +40,9 @@ public class Parser {
 			String action = "";
 			for (int j=0;j<act.length;j++) {
 				if (act[j].charAt(0) == 'x' || act[j].charAt(0) == 'y') {
-					action = action+act[j].substring(1);
+					action = action+" "+act[j].substring(1);
 				} else {
-					action = action+act[j];
+					action = action+" "+act[j];
 				}
 			}
 			s[i] = action;
