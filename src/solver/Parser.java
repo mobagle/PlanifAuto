@@ -51,7 +51,7 @@ public class Parser {
 	}
 	
 	/* Remet dans l'ordre des actions à effectuer par le robot */
-	public String[] actionDansLOrdre(ArrayList<String> listString, int size) {
+	/*public String[] actionDansLOrdre(ArrayList<String> listString, int size) {
 		String[] result = new String[size]; // Modification de sa taille en fonction du nombre d'actions
 		
 		for(String s : listString) {
@@ -66,7 +66,7 @@ public class Parser {
 			}
 		}
 		return result;
-	}
+	}*/
 	
 	/* Modifie les actions
 	 * Si action1 est égale à action2, 
@@ -103,7 +103,7 @@ public class Parser {
 			if (res > 0) {
 				String[] actionTab1 = tab[i].split(" ");
 				String[] actionTab2 = tab[i+1].split(" ");
-				String newAction = "dep ";
+				String newAction = "deplacement ";
 				if (res == 1) {
 					newAction += actionTab1[1]+" "+actionTab2[1]+" "+actionTab1[2]+" "+actionTab2[2];
 				} else if(res == 2) {
