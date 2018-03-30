@@ -35,7 +35,6 @@ public class Parser {
 		String[] acts = plan.split("\n");
 		String[] s = new String[acts.length];
 		for(int i=0;i<acts.length;i++) {
-			System.out.println("acts[i] : "+acts[i]);
 			String[] act = acts[i].split(" ");
 			String action = "";
 			for (int j=0;j<act.length;j++) {
@@ -46,7 +45,6 @@ public class Parser {
 				}
 			}
 			s[i] = action;
-			System.out.println("s[i] : "+s[i]);
 		}
 		return s;
 	}
