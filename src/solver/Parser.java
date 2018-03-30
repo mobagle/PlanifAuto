@@ -8,7 +8,6 @@ public class Parser {
 
 	/* Fonction principale, transforme le String (Json) en ArrayList d'actions à effectuer */
 	public ArrayList<String> getActions(String plan) {
-		Screen screen = new Screen();
 		// Tableau avec toutes les actions
 		String[] tab = getTabActions(plan);
 
@@ -23,7 +22,6 @@ public class Parser {
 		for(int i = 0; i<tab.length; i++) {
 			if (tab[i] != null) {
 				resultat.add(tab[i]);
-				screen.drawText("Action ", tab[i]);
 			}
 		}
 		return resultat;
@@ -36,6 +34,7 @@ public class Parser {
 		String[] acts = plan.split("\n");
 		String[] s = new String[acts.length];
 		for(int i=0;i<acts.length;i++) {
+			System.out.println("acts[i] : "+acts[i]);
 			String[] act = acts[i].split(" ");
 			String action = "";
 			for (int j=0;j<act.length;j++) {
@@ -45,6 +44,7 @@ public class Parser {
 					action = action+" "+act[j];
 				}
 			}
+			System.out.println("s[i] : "+s[i]);
 			s[i] = action;
 		}
 		return s;
@@ -141,11 +141,11 @@ public class Parser {
 	}
 
 	/* Recupere le nombre d'action à effectuer */
-	public int findNbActions(String a) {
+	/*public int findNbActions(String a) {
 		String[] str = a.split(" ");
 		int size = str.length;
 		return Integer.parseInt(str[size-1]) +1;
-	}
+	}*/
 	
 	/* Recupere le premier mot d'un string, separe par des espaces */
 	public String getPremierMot(String word) {
