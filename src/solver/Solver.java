@@ -42,7 +42,7 @@ public class Solver {
 	/* Lance le probleme avec pddl4j */
     public String testHSPplan() throws Exception {
     	
-        String[] args = new String[6];
+        String[] args = new String[4];
         args[0] = "-o";
         args[1] =  "./domain.pddl";
         //args[1] =  "./src/solver/pddlfiles/domain.pddl";
@@ -68,7 +68,7 @@ public class Solver {
                 res = planner.search2(problem);
             }
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return res;
     }
