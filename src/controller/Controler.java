@@ -316,7 +316,7 @@ public class Controler {
 
 	private boolean execute(String ac) {
 		// X largeur du terrain, Y longueur
-		screen.drawText("Action", ac);
+		screen.drawText("Action");
 		System.out.println(ac);
 		String action[] = ac.split(" ");
 		int x0, x1, y0, y1;
