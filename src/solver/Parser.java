@@ -22,6 +22,7 @@ public class Parser {
 		for(int i = 0; i<tab.length; i++) {
 			if (tab[i] != null) {
 				resultat.add(tab[i]);
+				System.out.println("tab[i] fin : "+tab[i]);
 			}
 		}
 		return resultat;
@@ -44,8 +45,8 @@ public class Parser {
 					action = action+" "+act[j];
 				}
 			}
-			System.out.println("s[i] : "+s[i]);
 			s[i] = action;
+			System.out.println("s[i] : "+s[i]);
 		}
 		return s;
 	}
