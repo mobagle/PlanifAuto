@@ -33,13 +33,20 @@ public class Parser {
 	 * Cree un tableau d'action en fonction du string plan retourné par pddl 
 	 */
 	public String[] getTabActions(String plan) {
-		System.out.println(plan+"\n ->");
-
-		//String[] acts = plan.split("\n");
-		
-		//for(int i=0;i<acts.length;i++) acts[i] = "0";
-		String[] s = new String[1];
-		s[0] = plan;
+		String[] acts = plan.split("\n");
+		String[] s = new String[acts.length];
+		for(int i=0;i<acts.length;i++) {
+			String[] act = acts[i].split(" ");
+			String action = "";
+			for (int j=0;j<act.length;j++) {
+				if (act[j].charAt(0) == 'x' || act[j].charAt(0) == 'y') {
+					action = action+act[j].substring(1);
+				} else {
+					action = action+act[j];
+				}
+			}
+			s[i] = action;
+		}
 		return s;
 	}
 	
