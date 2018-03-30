@@ -31,7 +31,7 @@ public class ProblemWriter {
 			
 			FileWriter fichier = new FileWriter(filename);
 			// Contenu fixe du domaine
-			String contenu = domaine2;
+			String contenu = domaine3;
 			
 			// Position de départ robot
 			contenu = contenu +	"        (is-on x"+departRobot.getX()+" y"+departRobot.getY()+")\n";
@@ -154,7 +154,7 @@ public class ProblemWriter {
     
     // Domaine utilisé, lachage des palets dans le camps adverse
     final private String domaine3 = 
-    		"(define (problem hanoi-tower)\n" + 
+    		"(define (problem palets)\n" + 
 			"    (:domain hanoi)\n" + 
 			"    (:objects\n" + 
 			"        x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 - posX\n" + 
