@@ -9,10 +9,9 @@ public class Parser {
 	/* Fonction principale, transforme le String (Json) en ArrayList d'actions à effectuer */
 	public ArrayList<String> getActions(String plan) {
 		Screen screen = new Screen();
-		screen.drawText("PLAN : "+plan);
 		// Tableau avec toutes les actions
 		String[] tab = getTabActions(plan);
-		
+
 		// Suppression des actions identiques à la suite
 		simplifier(tab);
 		
@@ -24,6 +23,7 @@ public class Parser {
 		for(int i = 0; i<tab.length; i++) {
 			if (tab[i] != null) {
 				resultat.add(tab[i]);
+				screen.drawText("Action ", tab[i]);
 			}
 		}
 		return resultat;
