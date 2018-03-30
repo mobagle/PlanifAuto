@@ -29,10 +29,6 @@ public class Solver {
 		}
 
 		// Recuperation des actions
-		/*
-		Jsonparser jspars = new Jsonparser();		
-		ArrayList<String> actions = jspars.getActions(plan);
-		*/
 		Parser pars = new Parser();
 		ArrayList<String> actions = pars.getActions(plan);
 

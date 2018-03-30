@@ -14,10 +14,10 @@ public class Parser {
 		String[] tab = getTabActions(plan);
 		
 		// Suppression des actions identiques à la suite
-		//simplifier(tab);
+		simplifier(tab);
 		
 		// Supprime les déplacements en angles droits
-		//raccourcie(tab);
+		raccourcie(tab);
 		
 		// Remplissage de l'ArrayList des actions
 		ArrayList<String> resultat = new ArrayList<String>();
@@ -33,7 +33,11 @@ public class Parser {
 	 * Cree un tableau d'action en fonction du string plan retourné par pddl 
 	 */
 	public String[] getTabActions(String plan) {
-		System.out.println(plan);
+		System.out.println(plan+"\n ->");
+
+		String[] acts = plan.split("\n");
+		
+		for(int i=0;i<acts.length;i++) acts[i] = "0";
 		String[] s = new String[1];
 		s[0] = plan;
 		return s;
