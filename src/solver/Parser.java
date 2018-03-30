@@ -35,9 +35,9 @@ public class Parser {
 	public String[] getTabActions(String plan) {
 		System.out.println(plan+"\n ->");
 
-		String[] acts = plan.split("\n");
+		//String[] acts = plan.split("\n");
 		
-		for(int i=0;i<acts.length;i++) acts[i] = "0";
+		//for(int i=0;i<acts.length;i++) acts[i] = "0";
 		String[] s = new String[1];
 		s[0] = plan;
 		return s;
