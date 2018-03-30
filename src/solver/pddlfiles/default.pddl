@@ -40,5 +40,7 @@
         (palet-is-on x9 y6)
         (palet-is-on x9 y9)
         )
-    (:goal (aPosePalet)
+    (:goal (and
+        (aPosePalet) 
+        (is-ony y12))
     ))

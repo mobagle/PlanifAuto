@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.exceptions.UsageException;
 import fr.uga.pddl4j.planners.hsp.HSP;
 import utils.IntPoint;
 
@@ -51,26 +50,8 @@ public class Solver {
         //args[3] = "./src/solver/pddlfiles/default.pddl";
         //args[4] = "-t";
         //args[5] = "10";
-        //return HSP.resolve(args);
-        
-        
-        String res = "";
-        try {
-            // Parse the command line
-            final Properties arguments = HSP.parseArguments(args);
-            // Create the planner
-            HSP planner = new HSP(arguments);
-            // Parse and encode the PDDL file into compact representation
-            final CodedProblem problem = planner.parseAndEncode();
+        return HSP.resolve(args);
 
-            if (problem != null) {
-                // Search for a solution and print the result
-                res = planner.search2(problem);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return res;
     }
     
 }

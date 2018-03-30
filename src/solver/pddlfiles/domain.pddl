@@ -11,6 +11,7 @@
         (palet-is-on ?x - posX ?y - posY)
         (peut-lacher ?x - posX ?y - posY)
         (is-on ?x - posX ?y - posY)
+        (is-ony ?y - posY)
         (depX ?x - posX ?y - posX)
         (depY ?x - posY ?y - posY))
 
@@ -26,7 +27,8 @@
     :precondition  (and (aPalet) (is-on ?x ?y) (peut-lacher ?x ?y))
     :effect 
     (and (palet-is-on ?x ?y)
-    	(aPosePalet)))
+    	(aPosePalet)
+    	(is-ony ?y)))
 
 (:action deplacementx1
     :parameters (?x - posX ?y - posX ?z - posY)
