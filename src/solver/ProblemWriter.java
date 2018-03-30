@@ -45,7 +45,7 @@ public class ProblemWriter {
 			contenu = contenu + "        )\n" + 
 								"    (:goal (and\n" +
 								"    	(aPosePalet)\n" +
-								"		(is-ony y12))";
+								"		(is-ony y12))))";
 			fichier.write (contenu);
 			fichier.close();
 		} catch (IOException e) {
