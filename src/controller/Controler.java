@@ -84,11 +84,9 @@ public class Controler {
 			}
 			seekLeft = true;
 
-			screen.drawText("Lancer", "Appuyez sur OK si la", "ligne noire est à gauche", "Appuyez sur tout autre",
-					"elle est à droite");
+			screen.drawText("Lancer", "Appuyez sur OK si la", "ligne noire est à gauche", "Appuyez sur tout autre", "elle est à droite");
 			if (input.isThisButtonPressed(input.waitAny(), Button.ID_ENTER)) {
 				seekLeft = true;
-
 			} else {
 				seekLeft = false;
 			}

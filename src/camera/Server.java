@@ -20,12 +20,7 @@ public class Server extends Thread{
 	 * buffer pour la reception des données
 	 */
 	private byte[] buffer			= new byte[2048];
-	
-	/**
-	 * temps en ms de la dernière reception des positions
-	 */
-	private int lastReceivedTimer	= 0;
-	
+
 	/**
 	 * vrai si le Thread doit se terminer, faux sinon
 	 */
@@ -58,7 +53,7 @@ public class Server extends Thread{
 	 */
 	public Server(Camera c){
 		super("Server");
-		this.camera 				= c;
+		this.camera 			= c;
 		this.packet 			= new DatagramPacket(this.buffer, this.buffer.length);
 		this.lastPointsReceived	= new ArrayList<IntPoint>();
 		try {
@@ -67,7 +62,6 @@ public class Server extends Thread{
 			System.out.println("[SERVER]                : Erreur, DatagramSocket non initialisé");
 			e1.printStackTrace();
 		}
-		
 		System.out.println("[SERVER]                : Initialized");
 	}
 			
@@ -79,35 +73,25 @@ public class Server extends Thread{
 		System.out.println("[SERVER]                : Started");
 		this.setPriority(Thread.NORM_PRIORITY);
 		while(! isInterrupted() && !this.stop){
-			System.out.println("[SERVER]                : WHILE");
 			try {
-				System.out.println("[SERVER]                : WAIT");
 				this.dsocket.receive(this.packet);
-				System.out.println("[SERVER]                : OK");
-
 			} catch (IOException e) {
-				System.out.println("[SERVER]                : Socket Closed");
 				this.stop = true;
 			}
-			System.out.println("[SERVER]                : RCV");
-
 			String msg = new String(this.buffer, 0, this.packet.getLength());
 			String[] items = msg.split("\n");
 			this.lastPointsReceived.clear();
-			for (int i = 0; i < items.length; i++) 
-	        {
+			for (int i = 0; i < items.length; i++) {
 				String[] coord = items[i].split(";");
 				if(coord.length == 3){
 					System.out.println(coord[0]+coord[1]+coord[2]);
 		        	int x = Integer.parseInt(coord[1]);
 		        	int y = Integer.parseInt(coord[2]);
-		        	
 		        	IntPoint p = this.traductionPoint(new IntPoint(x, y));
-		        	System.out.println(p);
 		        	this.lastPointsReceived.add(p);
 				}
 	        }
-			this.camera.receiveRawPoints(this.lastReceivedTimer,this.lastPointsReceived);
+			this.camera.receiveRawPoints(this.lastPointsReceived);
 			this.packet.setLength(this.buffer.length);
 		}
 		System.out.println("[SERVER]                : Finished");

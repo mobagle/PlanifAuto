@@ -44,14 +44,11 @@ public class Solver {
         String[] args = new String[4];
         args[0] = "-o";
         args[1] =  "./domain.pddl";
-        //args[1] =  "./src/solver/pddlfiles/domain.pddl";
         args[2] = "-f";
         args[3] = "./default.pddl";
-        //args[3] = "./src/solver/pddlfiles/default.pddl";
         //args[4] = "-t";
         //args[5] = "10";
+        
         return HSP.resolve(args);
-
     }
-    
 }

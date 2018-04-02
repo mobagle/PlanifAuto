@@ -20,15 +20,17 @@ public class Camera {
 		masterList.clear();
 	}
 	
-	synchronized public void receiveRawPoints(final int timeout, final ArrayList<IntPoint> PointsList) {
+	synchronized public void receiveRawPoints(final ArrayList<IntPoint> PointsList) {
 		cleanHashMap();
+		System.out.println("Reception des points :");
 		for(IntPoint tp : PointsList){
+			System.out.println(" - "+tp);
 			masterList.add(tp);
 		}
 	}
 	
 	public ArrayList<IntPoint> getPaletsPositions() {
-		return this.masterList;
+		return (ArrayList<IntPoint>) this.masterList.clone();
 	}
 	
 	
