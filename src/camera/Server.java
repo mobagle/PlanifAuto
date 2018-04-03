@@ -84,41 +84,15 @@ public class Server extends Thread{
 			for (int i = 0; i < items.length; i++) {
 				String[] coord = items[i].split(";");
 				if(coord.length == 3){
-					System.out.println(coord[0]+coord[1]+coord[2]);
 		        	int x = Integer.parseInt(coord[1]);
 		        	int y = Integer.parseInt(coord[2]);
-		        	IntPoint p = this.traductionPoint(new IntPoint(x, y));
-		        	this.lastPointsReceived.add(p);
+		        	this.lastPointsReceived.add(new IntPoint(x, y));
 				}
 	        }
 			this.camera.receiveRawPoints(this.lastPointsReceived);
 			this.packet.setLength(this.buffer.length);
 		}
 		System.out.println("[SERVER]                : Finished");
-	}
-	
-	private IntPoint traductionPoint(IntPoint intPoint) {
-		if (Controler.seekLeft) {
-			return traductionPointLeft(intPoint);
-		} else {
-			return traductionPointRight(intPoint);
-		}
-	}
-
-	private IntPoint traductionPointRight(IntPoint intPoint) {
-		int x = intPoint.getX();
-		int y = intPoint.getY();
-		int newX = (int)(Math.abs(200-x)/50)*3;
-		int newY = (int)(x/50)*3;
-		return new IntPoint(newX, newY);
-	}
-
-	private IntPoint traductionPointLeft(IntPoint intPoint) {
-		int x = intPoint.getX();
-		int y = intPoint.getY();
-		int newX = (int)(x/50)*3;
-		int newY = (int)(x/50)*3;
-		return new IntPoint(newX, newY);
 	}
 
 	@Override
