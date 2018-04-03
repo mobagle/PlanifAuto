@@ -1,0 +1,12 @@
+Nous avons repris le code de ...
+Les packages controller, motors, sensors et vue etaient déja présent.
+Controlleur a été un petit peu modofier pour ajouter pddl.
+
+Le package camera à été crée de toute piece.
+Il prend comme base le package camera du code de ..., mais bien modifier pour que la résuperation des points se fasse en accord avec notre domaine pddl
+
+Nous avons créé le package solver :
+dans ce package il y a 3 classe :
+Solver, la classe principale qui appelle ProblemWriter et Parser et donne directement les actions à effectuer
+ProblemWriter, qui a pour but d'écrire le probleme au format compris par pddl, avec la position des palets et du robot qui changent
+Parser récupére le resultat de pddl, modifie les actions pour qu'elles soient plus simple pour le robot
