@@ -45,8 +45,11 @@ public class Camera {
 
 	private IntPoint traductionPoint(IntPoint intPoint) {
 		int newX = findX(intPoint.getX());
-		if (!seekLeft) newX = 12-newX;
 		int newY = findY(intPoint.getY());
+		if (!seekLeft) {
+			newX = 12-newX;
+			newY = 12-newY;
+		}
 		return new IntPoint(newX, newY);
 	}
 
