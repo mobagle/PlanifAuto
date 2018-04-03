@@ -1,12 +1,40 @@
-Nous avons repris le code de ...
-Les packages controller, motors, sensors et vue etaient déja présent.
-Controlleur a été un petit peu modofier pour ajouter pddl.
+AULAGNIER Corentin
+BOCHATON Mathieu
+CHELLE Lea
 
-Le package camera à été crée de toute piece.
-Il prend comme base le package camera du code de ..., mais bien modifier pour que la résuperation des points se fasse en accord avec notre domaine pddl
+PATIA
 
-Nous avons créé le package solver :
-dans ce package il y a 3 classe :
-Solver, la classe principale qui appelle ProblemWriter et Parser et donne directement les actions à effectuer
-ProblemWriter, qui a pour but d'écrire le probleme au format compris par pddl, avec la position des palets et du robot qui changent
-Parser récupére le resultat de pddl, modifie les actions pour qu'elles soient plus simple pour le robot
+cf rapport Carretero,  Chastagner
+
+- Introduction
+
+Pour la base de notre code, nous avons repris le code de Lavocat Terrier et Faure. Les packages : controller, motors, sensors, utils et vue etaient déja présents. Nous avons créé deux nouveaux packages : solver et camera. Nous détaillerons plus tard leurs fonctionnement.
+
+- Modification du code de départ
+
+Le code etait trés complet, cependant, difficile à prendre en main. Nous avons modifié certaines parties que nous pensions inutiles.
+
+le package controller a été modifié en grande partie pour prendre en compte pddl4j, et l'execution des nouvelles actions.
+
+- Package camera
+
+Ce package à été crée de toutes pieces. Pour la class principale Server, nous nous sommes grandement inspirés du code de Carretero et Chastagner. Nous avons modifié la partie "Camera" avec la récuperation des points et la mise à l'echelle avec notre représentation de la carte dans pddl.
+
+- Package solver
+
+Dans ce nouveau package, nous avons créé trois classes :
+Solver : la classe principale qui appelle ProblemWriter et Parser. Elle donne directement les actions à effectuer au controller.
+Parser : récupére le resultat de pddl, simplifie la liste des actions pour que le robot ait moins d'actions differentes à traiter.
+ProblemWriter : qui a pour but d'écrire le probleme au format compris par pddl, avec les positions des palets et du robot qui changent.
+
+Decription de notre domaine pddl :
+Nous avons découpé notre table en 13 lignes [0...12] (0 correspond à notre gauche, et 12 à notre droite) et en 13 colonnes [0...12] (0 correspond à la ligne blanche de notre embute, et 12 à la ligne blanche de l'embute adverse).
+
+PHOTO
+
+
+Chaque action permet de simuler le déplacement sur une case adjacente. Deux actions permettent de prendre (resp. lacher) un palet. Nous avons décider de lacher un palet seulement si y = 12 (nous somme au niveau de l'embute adverse).
+
+
+
+
