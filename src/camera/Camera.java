@@ -34,8 +34,11 @@ public class Camera {
 		System.out.println("Reception des points :");
 		for(IntPoint tp : PointsList){
         	IntPoint p = this.traductionPoint(tp);
-			System.out.println(" - "+p);
-			masterList.add(p);
+			int valide = p.getY();
+			if (valide >0 && valide<12) {
+				System.out.println(" - "+p);
+				masterList.add(p);
+			}
 		}
 	}
 	
@@ -71,8 +74,8 @@ public class Camera {
 	}
 	
 	private int findY(int y) {
-		if (y<= 50 && y >= 38) return 0;
-		else if (y<= 70 && y >= 39) return 1;
+		if (y<= 50 && y >= 43) return 0;
+		else if (y<= 70 && y >= 51) return 1;
 		else if (y<= 96 && y >= 71) return 2;
 		else if (y<= 109 && y >= 97) return 3;
 		else if (y<= 135 && y >= 110) return 4;
