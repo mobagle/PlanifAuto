@@ -172,24 +172,23 @@ public class Controler {
 	/**
 	 * Lance pdll pour trouver les actions Ã  effectuer
 	 */
-	private static ArrayList<String> findGoals() {
+	private ArrayList<String> findGoals() {
 		Solver s = new Solver();
 
-		// Rï¿½cuperation des points
-		// camera.get ...
-		// Pour l'instant statics
-		IntPoint marvin = new IntPoint(0, 0);
+		/*
 		ArrayList<IntPoint> listPalets = new ArrayList<>();
 		for (int i = 3; i < 10; i = i + 3)
 			for (int j = 3; j < 10; j = j + 3)
-				listPalets.add(new IntPoint(i, j));
-		// listPalets.add(new IntPoint(3, 3));
-
-		// Recherche des action a effectuer
-		return s.findActions(marvin, null, listPalets);
+				listPalets.add(new IntPoint(i, j));*/
+		// Recuperation des points
+		ArrayList<IntPoint> listPalets = camera.getPaletsPositions();
+		if (listPalets == null) System.out.println("Pas de points recu par la camera");
+		
+		// Recherche des action a effectuer 
+		return s.findActions(this.myPos,listPalets);
 	}
 	
-	/** Mets à jour le temps moyen nécessaire pour avancer d'une unité */
+	/** Mets ï¿½ jour le temps moyen nï¿½cessaire pour avancer d'une unitï¿½ */
 	private void majTimeToRunByUnit(double dist, long time) {
 		System.out.println("Old TimeToRunByUnit: " + timeForOneUnit +" ms | dist: "+ dist+" | time: "+time);
 		distanceTot += dist;

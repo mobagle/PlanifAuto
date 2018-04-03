@@ -17,10 +17,10 @@ public class Solver {
 	 * - trouve la liste des actions à effectuer 
 	 * - la parse
 	 */
-	public ArrayList<String> findActions(IntPoint departRobot, IntPoint arriveRobot, ArrayList<IntPoint> palets) {
+	public ArrayList<String> findActions(IntPoint departRobot, ArrayList<IntPoint> palets) {
 		// Ecriture du probleme
 		ProblemWriter pw = new ProblemWriter();
-		pw.write(departRobot, arriveRobot, palets);
+		pw.write(departRobot, palets);
 		String plan = "";
 		
 		// Récuperation de la sortie du solver
