@@ -189,6 +189,7 @@ public class Controler {
 		return s.findActions(marvin, null, listPalets);
 	}
 	
+	/** Mets à jour le temps moyen nécessaire pour avancer d'une unité */
 	private void majTimeToRunByUnit(double dist, long time) {
 		System.out.println("Old TimeToRunByUnit: " + timeForOneUnit +" ms | dist: "+ dist+" | time: "+time);
 		distanceTot += dist;
