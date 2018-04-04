@@ -20,6 +20,7 @@ import sensors.VisionSensor;
 import vue.InputHandler;
 import vue.Screen;
 import solver.Solver;
+import utils.ColorGrid;
 import utils.IntPoint;
 import utils.R2D2Constants;
 import lejos.hardware.Button;
@@ -41,10 +42,12 @@ public class Controler {
 	private double distanceTot;
 	private long runningTimeTot;
 	private long timeForOneUnit;
-
-	enum State {
-		toThePalet, toTheHome
-	};
+	private long start;
+	private long elapsedTime;
+	private double distance;
+	private boolean vaPoser;
+	private boolean firstPass;
+	private boolean aGauche;
 
 	private ArrayList<TImedMotor> motors = new ArrayList<TImedMotor>();
 
@@ -59,10 +62,12 @@ public class Controler {
 		input = new InputHandler(screen);
 		motors.add(propulsion);
 		motors.add(graber);
-		myPos = new IntPoint(0, 0);
+		myPos = new IntPoint(6, 0);
 		distanceTot = 0;
 		runningTimeTot = 0;
-		timeForOneUnit = 2500;
+		timeForOneUnit = 650;
+		vaPoser = false;
+		firstPass = true;
 	}
 
 	/**
@@ -74,34 +79,37 @@ public class Controler {
 	 * @throws ClassNotFoundException
 	 */
 	public void start() throws IOException, ClassNotFoundException {
-		loadCalibration();
+		boolean cal = loadCalibration();
 
 		screen.drawText("Calibration", "Appuyez sur echap ", "pour skipper");
-		boolean skip = true;//input.waitOkEscape(Button.ID_ESCAPE);
+		boolean skip = cal || input.waitOkEscape(Button.ID_ESCAPE);
 		if (skip || calibration()) {
 			if (!skip) {
 				saveCalibration();
 			}
 			seekLeft = true;
 
-			screen.drawText("Lancer", "Appuyez sur OK si la", "ligne noire est Ã  gauche", "Appuyez sur tout autre", "elle est Ã  droite");
+			screen.drawText("Lancer", "Appuyez sur OK si la", "ligne noire est a  gauche", "Appuyez sur tout autre",
+					"elle est a droite");
 			if (input.isThisButtonPressed(input.waitAny(), Button.ID_ENTER)) {
 				seekLeft = true;
 			} else {
 				seekLeft = false;
 			}
 			seekLeft = false;
+<<<<<<< HEAD
 			
+=======
+			// camera.setSeekLeft(seekLeft);
+			//propulsion.seDegreeToNorth(270);
+>>>>>>> refs/remotes/origin/master
 			mainLoop();
 		}
 
 		/*
-		// my code
-		seekLeft = true;
-		mainLoop();
-		// end my code
-		*/
-		
+		 * // my code seekLeft = true; mainLoop(); // end my code
+		 */
+
 		cleanUp();
 	}
 
@@ -112,14 +120,16 @@ public class Controler {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	private void loadCalibration() throws FileNotFoundException, IOException, ClassNotFoundException {
+	private boolean loadCalibration() throws FileNotFoundException, IOException, ClassNotFoundException {
 		File file = new File("calibration");
 		if (file.exists()) {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
 			color.setCalibration((float[][]) ois.readObject());
 			graber.setOpenTime((long) ois.readObject());
 			ois.close();
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -188,62 +198,76 @@ public class Controler {
 		// Recherche des action a effectuer 
 		return s.findActions(this.myPos,listPalets);
 	}
-	
-	/** Mets ï¿½ jour le temps moyen nï¿½cessaire pour avancer d'une unitï¿½ */
+
+	/** Mets à jour le temps moyen nécessaire pour avancer d'une unité */
 	private void majTimeToRunByUnit(double dist, long time) {
 		System.out.println("Old TimeToRunByUnit: " + timeForOneUnit +" ms | dist: "+ dist+" | time: "+time);
 		distanceTot += dist;
-		runningTimeTot +=time;
-		timeForOneUnit = (long) (runningTimeTot/distanceTot);
+		runningTimeTot += time;
+		timeForOneUnit = (long) (runningTimeTot / distanceTot);
 		System.out.println("New TimeToRunByUnit: " + timeForOneUnit +" ms");
 	}
 
 	private boolean execute(String ac) {
 		// X largeur du terrain, Y longueur
-		screen.drawText("Action");
-		System.out.println(ac);
+		// System.out.println(ac);
 		String action[] = ac.split(" ");
 		int x0, x1, y0, y1;
 		for (TImedMotor m : motors)
 			m.checkState();
 		switch (action[0]) {
-		case "prendrePalet":
-			boolean ret = false;
-			double distance = distance(myPos, dest);
-			int ttl = (int)(timeForOneUnit * distance);
-			// avance jusqu'ï¿½ toucher le palet
-			propulsion.runFor(ttl,true);
-			long start = System.currentTimeMillis();
-			long elapsedTime = 0;
+
+		case "prendrepalet":
+			/*
+			 * double distance = distance(myPos, dest); int ttl = (int)(timeForOneUnit *
+			 * distance); // avance jusqu'ï¿½ toucher le palet
+			 * 
+			 * propulsion.runFor(ttl,true); while (propulsion.isRunning()) {
+			 * propulsion.checkState();
+			 *
+			 * if(vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des
+			 * roues propulsion.stopMoving(); System.out.println("COLLISION"); return false;
+			 * } else
+			 *
+			 * 
+			 * }
+			 */
+
+			// if(vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des
+			// roues
+			// propulsion.stopMoving();
+			// System.out.println("COLLISION");
+			// return false;
+			// }
+
+			//if (pression.isPressed()) {
+				// arret des roues
+				// System.out.println("PRESSION");
+				elapsedTime = System.currentTimeMillis() - start;
+				majTimeToRunByUnit(distance, elapsedTime);
+				myPos = dest;
+				graber.close();
+				// attend la fin de la fermeture des pinces
+				while (graber.isRunning()) {
+					graber.checkState();
+				}
+				vaPoser = true;
+				return true;
+			//}
+
+			//return false;
+
+		case "lacherpalet":
+			/*
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
-				/*
-				 * if(vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des
-				 * roues propulsion.stopMoving(); System.out.println("COLLISION"); return false;
-				 * } else
-				 */
-				if (pression.isPressed()) {
-					// arret des roues
-					System.out.println("PRESSION");
+				if (vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des roues
 					propulsion.stopMoving();
-					elapsedTime = System.currentTimeMillis() - start;
-					majTimeToRunByUnit(distance, elapsedTime);
-					ret = true;
-					break;
+					return false;
 				}
 			}
-			graber.close();
-			// attend la fin de la fermeture des pinces
-			while (graber.isRunning()) {
-				graber.checkState();
-			}
-			return ret;
-
-		case "lacherPalet":
-			distance = distance(myPos, dest);
-			ttl = (int)(timeForOneUnit * distance);
-			// avance jusqu'ï¿½ toucher le palet
-			propulsion.runFor(ttl,true);
+			*/
+			propulsion.runFor(400, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
@@ -255,35 +279,76 @@ public class Controler {
 			}
 
 			// recule aprï¿½s avoir lacher le palet
-			propulsion.runFor(R2D2Constants.EMPTY_HANDED_STEP_FORWARD, false);
+			propulsion.runFor(400, false);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
+			/*
+			propulsion.rotate(180, true, false);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+			}
+			*/
+			
+			vaPoser = false;
+			firstPass = false;
 			return true;
 
 		case "deplacement":
-			//initialisation des points
+			// initialisation des points
 			x0 = Integer.valueOf(action[1]);
-			x1 = Integer.valueOf(action[2]);
-			y0 = Integer.valueOf(action[3]);
+			y0 = Integer.valueOf(action[2]);
+			x1 = Integer.valueOf(action[3]);
 			y1 = Integer.valueOf(action[4]);
 			myPos = new IntPoint(x0, y0);
 			dest = new IntPoint(x1, y1);
-			IntPoint north = new IntPoint(x0, 12);
+			int nextY = 16;
+			IntPoint north = new IntPoint(x0, nextY);
 			// rotation
 
 			int degrees = angle(myPos, dest, north);
 			System.out.println("computed angle: " + degrees);
-			
-			int myOrientation = (int)propulsion.getRotateToNorth();
+
+			int myOrientation = (int) propulsion.getRotateToNorth();
 			System.out.println("my orientation: " + myOrientation);
+
+			int angle = degrees + myOrientation;
+			angle = angle%360;
+			if(angle>180) angle -= 360;
 			
-			int angle = degrees - myOrientation;
+			if(!vaPoser && !firstPass) {
+				if(x0 > x1) {
+					angle = -angle;
+					aGauche = true;
+				} else {
+					aGauche = false;
+				}
+			}
+			else if(vaPoser && !firstPass && aGauche) {
+				angle = Math.abs(angle);
+			}
 			System.out.println("angle corrected: " + angle);
 
-			propulsion.rotate(Math.abs(angle), false, true);
+			boolean left = false;
+			if(angle<0) left = true;
+			
+			propulsion.rotate(Math.abs(angle), left, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
+			}
+
+			distance = distance(myPos, dest);
+			int ttl = (int) (timeForOneUnit * distance);
+			System.out.println("distance: "+distance+ " | timeByUnit: "+timeForOneUnit+" | ttl: "+ttl);
+			// avance jusqu'ï¿½ toucher le palet
+			start = System.currentTimeMillis();
+			propulsion.runFor(ttl, true);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+				if (!vaPoser && pression.isPressed()) {
+					propulsion.stopMoving();
+					return true;
+				}
 			}
 
 			return true;
@@ -294,11 +359,21 @@ public class Controler {
 	}
 
 	/** retourne la distance absolue entre les points p1 et p2 */
-	private double distance(IntPoint p1, IntPoint p2) {
+	private double distanceBasic(IntPoint p1, IntPoint p2) {
 		return Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2));
 	}
 
-	/** retourne l'angle en degrees en p1 formï¿½ par les points p2 et p3*/
+	/**
+	 * retourne la distance absolue entre les points p1 et p2 dans la grille pas
+	 * carrée
+	 */
+	private double distance(IntPoint p1, IntPoint p2) {
+		double etirementY = 1.2;
+		return Math.sqrt(
+				Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() * etirementY - p1.getY() * etirementY, 2));
+	}
+
+	/** retourne l'angle en degrees en p1 formï¿½ par les points p2 et p3 */
 	private int angle(IntPoint p1, IntPoint p2, IntPoint p3) {
 		double ab = distance(p1, p2);
 		double ac = distance(p1, p3);
@@ -309,27 +384,31 @@ public class Controler {
 	}
 
 	private void mainLoop() {
-
 		boolean run = true;
 		boolean pasDeProbleme = true;
 		ArrayList<String> goals = new ArrayList<>();
 		String goal;
-		/*
-		goals.add("deplacement 0 2 0 3");
-		goals.add("prendrePalet");
-		goals.add("deplacement 2 0 3 0");
-		goals.add("lacherPalet");
-		goals.add("deplacement 0 0 0 3");
-		goals.add("prendrePalet");
-		goals.add("deplacement 0 0 3 0");
-		goals.add("lacherPalet");
-		*/
+		propulsion.seDegreeToNorth(0);
+		 goals.add("deplacement 6 0 9 6"); goals.add("prendrepalet");
+		 goals.add("deplacement 9 6 9 12"); goals.add("lacherpalet");
+		 
+		 goals.add("deplacement 9 12 3 9"); goals.add("prendrepalet");
+		 goals.add("deplacement 3 9 3 12"); goals.add("lacherpalet");
+		 
+		 goals.add("deplacement 3 12 9 9"); goals.add("prendrepalet");
+		 goals.add("deplacement 9 9 9 12"); goals.add("lacherpalet");
+		 /* goals.add("deplacement 2 0 3 0"); goals.add("lacherpalet");
+		 * goals.add("deplacement 0 0 0 3"); goals.add("prendrepalet");
+		 * goals.add("deplacement 0 0 3 0"); goals.add("lacherpalet");
+		 */
 		while (run) {
-			goals = findGoals();
+			screen.drawText("Reflexion", "Calcul de l'itinéraire", "en cours");
+			//goals = findGoals();
 			ListIterator<String> li = goals.listIterator();
 			while (li.hasNext() && pasDeProbleme) {
 				goal = li.next();
-				System.out.println("ACTION : "+goal);
+				screen.drawText("Action", goal);
+				System.out.println(goal);
 				if (goal != null) {
 					pasDeProbleme = execute(goal);
 				}
