@@ -18,6 +18,16 @@ public class Camera {
 	int[] X = new int[13];
 	int[] Y = new int[13];
 
+	private boolean seekLeft;
+	
+	private final ArrayList<IntPoint> masterList;
+
+	public Camera() {
+		masterList = new ArrayList<IntPoint>();
+		seekLeft = true;
+		recupererCalibrage();
+	}
+	
 	// Calibre avec les 9 palets au départ
 	public void calibrer(ArrayList<IntPoint> points) {
 		IntPoint[] tabPoints = getTab(points); // 0,0 12,0 0,12 12,12 6,6 
@@ -43,6 +53,7 @@ public class Camera {
 				if (Y[i] > Y[i-1] + 4*deltaY) System.out.println("Probleme Calibration de Y");
 			}
 		}
+		saveCalibrage();
 	}
 	
 	private int moyenne(int a, int b) {
@@ -70,16 +81,6 @@ public class Camera {
 			}
 		}
 		return tab;
-	}
-
-	private boolean seekLeft;
-	
-	private final ArrayList<IntPoint> masterList;
-
-	public Camera() {
-		masterList = new ArrayList<IntPoint>();
-		seekLeft = true;
-		recupererCalibrage();
 	}
 	
 	private void saveCalibrage() {
