@@ -91,6 +91,7 @@ public class Controler {
 				seekLeft = false;
 			}
 			seekLeft = false;
+			
 			mainLoop();
 		}
 
