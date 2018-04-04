@@ -89,7 +89,7 @@ public class Controler {
 			}
 			seekLeft = true;
 
-			screen.drawText("Lancer", "Appuyez sur OK si la", "ligne noire est a  gauche", "Appuyez sur tout autre",
+			screen.drawText("Lancer", "Appuyez sur OK si la", "ligne noire est aï¿½ gauche", "Appuyez sur tout autre",
 					"elle est a droite");
 			if (input.isThisButtonPressed(input.waitAny(), Button.ID_ENTER)) {
 				seekLeft = true;
@@ -97,12 +97,10 @@ public class Controler {
 				seekLeft = false;
 			}
 			seekLeft = false;
-<<<<<<< HEAD
-			
-=======
+
 			// camera.setSeekLeft(seekLeft);
 			//propulsion.seDegreeToNorth(270);
->>>>>>> refs/remotes/origin/master
+			camera.setSeekLeft(seekLeft);
 			mainLoop();
 		}
 
@@ -199,7 +197,7 @@ public class Controler {
 		return s.findActions(this.myPos,listPalets);
 	}
 
-	/** Mets à jour le temps moyen nécessaire pour avancer d'une unité */
+	/** Mets ï¿½ jour le temps moyen nï¿½cessaire pour avancer d'une unitï¿½ */
 	private void majTimeToRunByUnit(double dist, long time) {
 		System.out.println("Old TimeToRunByUnit: " + timeForOneUnit +" ms | dist: "+ dist+" | time: "+time);
 		distanceTot += dist;
@@ -365,7 +363,7 @@ public class Controler {
 
 	/**
 	 * retourne la distance absolue entre les points p1 et p2 dans la grille pas
-	 * carrée
+	 * carrï¿½e
 	 */
 	private double distance(IntPoint p1, IntPoint p2) {
 		double etirementY = 1.2;
@@ -402,7 +400,7 @@ public class Controler {
 		 * goals.add("deplacement 0 0 3 0"); goals.add("lacherpalet");
 		 */
 		while (run) {
-			screen.drawText("Reflexion", "Calcul de l'itinéraire", "en cours");
+			screen.drawText("Reflexion", "Calcul de l'itinï¿½raire", "en cours");
 			//goals = findGoals();
 			ListIterator<String> li = goals.listIterator();
 			while (li.hasNext() && pasDeProbleme) {
