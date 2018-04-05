@@ -93,7 +93,6 @@ public class Traducteur {
 						if (Y[i] > Y[i-1] + 3*deltaY) System.out.println("TRADUCTEUR : Probleme Calibration de Y");
 					}
 				}
-				System.out.println("SAVEEEEE");
 				saveCalibrage();
 		//} catch (Exception e) {
 			//System.out.println("TRADUCTEUR : Exception dans le calibrage");
