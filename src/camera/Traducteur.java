@@ -133,9 +133,9 @@ public class Traducteur {
 	}
 
 	private IntPoint traductionPoint(IntPoint intPoint) {
-		int newX = findX(intPoint.getX());
+		int newX = 12-findX(intPoint.getX());
 		int newY = findY(intPoint.getY());
-		if (seekLeft && newX!=-1 && newY!=-1) {
+		if (!seekLeft && newX!=-1 && newY!=-1) {
 			newX = 12-newX;
 			newY = 12-newY;
 		}
