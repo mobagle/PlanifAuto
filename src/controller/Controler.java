@@ -20,7 +20,6 @@ import sensors.VisionSensor;
 import vue.InputHandler;
 import vue.Screen;
 import solver.Solver;
-import utils.ColorGrid;
 import utils.IntPoint;
 import utils.R2D2Constants;
 import lejos.hardware.Button;
