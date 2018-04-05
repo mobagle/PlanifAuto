@@ -64,7 +64,7 @@ public class Server extends Thread{
 			System.out.println("[SERVER]                : Erreur, DatagramSocket non initialisé");
 			e1.printStackTrace();
 		}
-		System.out.println("[SERVER]                : Initialized");
+		//System.out.println("[SERVER]                : Initialized");
 	}
 			
 	/**
@@ -72,7 +72,7 @@ public class Server extends Thread{
 	 */
 	@Override
 	public void run() {
-		System.out.println("[SERVER]                : Started");
+		//System.out.println("[SERVER]                : Started");
 		this.setPriority(Thread.NORM_PRIORITY);
 		while(! isInterrupted() && !this.stop){
 			try {
@@ -95,12 +95,12 @@ public class Server extends Thread{
 			if (calibreTraducteur) {
 				this.camera.calibrer(this.lastPointsReceived);
 				calibreTraducteur = false;
-				System.out.println("[SERVER]                : Cam calibre");
+				//System.out.println("[SERVER]                : Cam calibre");
 			}
 			else this.camera.receiveRawPoints(this.lastPointsReceived);
 			this.packet.setLength(this.buffer.length);
 		}
-		System.out.println("[SERVER]                : Finished");
+		//System.out.println("[SERVER]                : Finished");
 	}
 
 	@Override

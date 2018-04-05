@@ -47,6 +47,7 @@ public class Controler {
 	private boolean vaPoser;
 	private boolean firstPass;
 	private boolean aGauche;
+	private boolean touche;
 
 	private ArrayList<TImedMotor> motors = new ArrayList<TImedMotor>();
 
@@ -61,12 +62,12 @@ public class Controler {
 		input = new InputHandler(screen);
 		motors.add(propulsion);
 		motors.add(graber);
-		myPos = new IntPoint(6, 0);
 		distanceTot = 0;
 		runningTimeTot = 0;
-		timeForOneUnit = 650;
+		timeForOneUnit = 1000;
 		vaPoser = false;
 		firstPass = true;
+		touche = false;
 	}
 
 	/**
@@ -98,7 +99,20 @@ public class Controler {
 			seekLeft = false;
 
 			camera.setSeekLeft(seekLeft);
-			mainLoop();
+			screen.clearPrintln();
+			screen.clearDraw();
+			screen.drawText("Position", "< Gauche", "OK Milieu", "> Droite");
+			int btn =  input.waitAny();
+			if (btn == Button.ID_LEFT) {
+				myPos = new IntPoint(3, 0);
+			} else if (btn ==  Button.ID_RIGHT) {
+				myPos = new IntPoint(9, 0);
+			} else if (btn == Button.ID_ENTER) {
+				myPos = new IntPoint(6, 0);
+			}
+			if (myPos != null) {
+				mainLoop();
+			}
 		}
 
 		/*
@@ -182,25 +196,26 @@ public class Controler {
 		Solver s = new Solver();
 
 		/*
-		ArrayList<IntPoint> listPalets = new ArrayList<>();
-		for (int i = 3; i < 10; i = i + 3)
-			for (int j = 3; j < 10; j = j + 3)
-				listPalets.add(new IntPoint(i, j));*/
+		 * ArrayList<IntPoint> listPalets = new ArrayList<>(); for (int i = 3; i < 10; i
+		 * = i + 3) for (int j = 3; j < 10; j = j + 3) listPalets.add(new IntPoint(i,
+		 * j));
+		 */
 		// Recuperation des points
 		ArrayList<IntPoint> listPalets = camera.getPaletsPositions();
-		if (listPalets == null) System.out.println("Pas de points recu par la camera");
-		
-		// Recherche des action a effectuer 
-		return s.findActions(this.myPos,listPalets);
+		if (listPalets == null)
+			System.out.println("Pas de points recu par la camera");
+
+		// Recherche des action a effectuer
+		return s.findActions(myPos, listPalets);
 	}
 
 	/** Mets � jour le temps moyen n�cessaire pour avancer d'une unit� */
 	private void majTimeToRunByUnit(double dist, long time) {
-		System.out.println("Old TimeToRunByUnit: " + timeForOneUnit +" ms | dist: "+ dist+" | time: "+time);
+		System.out.println("Old TimeToRunByUnit: " + timeForOneUnit + " ms | dist: " + dist + " | time: " + time);
 		distanceTot += dist;
 		runningTimeTot += time;
 		timeForOneUnit = (long) (runningTimeTot / distanceTot);
-		System.out.println("New TimeToRunByUnit: " + timeForOneUnit +" ms");
+		System.out.println("New TimeToRunByUnit: " + timeForOneUnit + " ms");
 	}
 
 	private boolean execute(String ac) {
@@ -235,33 +250,40 @@ public class Controler {
 			// return false;
 			// }
 
-			//if (pression.isPressed()) {
-				// arret des roues
-				// System.out.println("PRESSION");
-				elapsedTime = System.currentTimeMillis() - start;
-				majTimeToRunByUnit(distance, elapsedTime);
-				myPos = dest;
-				graber.close();
-				// attend la fin de la fermeture des pinces
-				while (graber.isRunning()) {
-					graber.checkState();
+			// if (pression.isPressed()) {
+			// arret des roues
+			// System.out.println("PRESSION");
+			
+			if (!touche) {
+				propulsion.runFor(800, true);
+				while (propulsion.isRunning()) {
+					if (pression.isPressed()) {
+						propulsion.stopMoving();
+						break;
+					}
+					propulsion.checkState();
 				}
-				vaPoser = true;
-				return true;
-			//}
+			}
+						
+			elapsedTime = System.currentTimeMillis() - start;
+			majTimeToRunByUnit(distance, elapsedTime);
+			graber.close();
+			// attend la fin de la fermeture des pinces
+			while (graber.isRunning()) {
+				graber.checkState();
+			}
+			vaPoser = true;
+			return true;
+		// }
 
-			//return false;
+		// return false;
 
 		case "lacherpalet":
 			/*
-			while (propulsion.isRunning()) {
-				propulsion.checkState();
-				if (vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des roues
-					propulsion.stopMoving();
-					return false;
-				}
-			}
-			*/
+			 * while (propulsion.isRunning()) { propulsion.checkState(); if
+			 * (vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des roues
+			 * propulsion.stopMoving(); return false; } }
+			 */
 			propulsion.runFor(400, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
@@ -279,17 +301,16 @@ public class Controler {
 				propulsion.checkState();
 			}
 			/*
-			propulsion.rotate(180, true, false);
-			while (propulsion.isRunning()) {
-				propulsion.checkState();
-			}
-			*/
-			
+			 * propulsion.rotate(180, true, false); while (propulsion.isRunning()) {
+			 * propulsion.checkState(); }
+			 */
+
 			vaPoser = false;
 			firstPass = false;
 			return true;
 
 		case "deplacement":
+			touche = false;
 			// initialisation des points
 			x0 = Integer.valueOf(action[1]);
 			y0 = Integer.valueOf(action[2]);
@@ -308,25 +329,26 @@ public class Controler {
 			System.out.println("my orientation: " + myOrientation);
 
 			int angle = degrees + myOrientation;
-			angle = angle%360;
-			if(angle>180) angle -= 360;
-			
-			if(!vaPoser && !firstPass) {
-				if(x0 > x1) {
+			angle = angle % 360;
+			if (angle > 180)
+				angle -= 360;
+
+			if (!vaPoser && !firstPass) {
+				if (x0 > x1) {
 					angle = -angle;
 					aGauche = true;
 				} else {
 					aGauche = false;
 				}
-			}
-			else if(vaPoser && !firstPass && aGauche) {
+			} else if (vaPoser && !firstPass && aGauche) {
 				angle = Math.abs(angle);
 			}
 			System.out.println("angle corrected: " + angle);
 
 			boolean left = false;
-			if(angle<0) left = true;
-			
+			if (angle < 0)
+				left = true;
+
 			propulsion.rotate(Math.abs(angle), left, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
@@ -334,18 +356,24 @@ public class Controler {
 
 			distance = distance(myPos, dest);
 			int ttl = (int) (timeForOneUnit * distance);
-			System.out.println("distance: "+distance+ " | timeByUnit: "+timeForOneUnit+" | ttl: "+ttl);
+			System.out.println("distance: " + distance + " | timeByUnit: " + timeForOneUnit + " | ttl: " + ttl);
 			// avance jusqu'� toucher le palet
 			start = System.currentTimeMillis();
-			propulsion.runFor(ttl, true);
+			if(vaPoser) {
+				propulsion.run(true);
+			} else {
+				propulsion.runFor(ttl, true);
+			}
+			myPos = dest;
+			
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 				if ((!vaPoser && pression.isPressed()) || (vaPoser && color.getCurrentColor() == Color.WHITE)) {
+					touche = true;
 					propulsion.stopMoving();
 					return true;
 				}
 			}
-
 			return true;
 
 		default:
@@ -385,19 +413,21 @@ public class Controler {
 		String goal;
 		propulsion.seDegreeToNorth(0);
 		/*
-		 goals.add("deplacement 6 0 9 6"); goals.add("prendrepalet");
-		 goals.add("deplacement 9 6 9 12"); goals.add("lacherpalet");
-		 
-		 goals.add("deplacement 9 12 3 9"); goals.add("prendrepalet");
-		 goals.add("deplacement 3 9 3 12"); goals.add("lacherpalet");
-		 
-		 goals.add("deplacement 3 12 9 9"); goals.add("prendrepalet");
-		 goals.add("deplacement 9 9 9 12"); goals.add("lacherpalet");
-		  goals.add("deplacement 2 0 3 0"); goals.add("lacherpalet");
+		 * goals.add("deplacement 6 0 9 6"); goals.add("prendrepalet");
+		 * goals.add("deplacement 9 6 9 12"); goals.add("lacherpalet");
+		 * 
+		 * goals.add("deplacement 9 12 3 9"); goals.add("prendrepalet");
+		 * goals.add("deplacement 3 9 3 12"); goals.add("lacherpalet");
+		 * 
+		 * goals.add("deplacement 3 12 9 9"); goals.add("prendrepalet");
+		 * goals.add("deplacement 9 9 9 12"); goals.add("lacherpalet");
+		 * goals.add("deplacement 2 0 3 0"); goals.add("lacherpalet");
 		 * goals.add("deplacement 0 0 0 3"); goals.add("prendrepalet");
 		 * goals.add("deplacement 0 0 3 0"); goals.add("lacherpalet");
 		 */
 		while (run) {
+			screen.clearPrintln();
+			screen.clearDraw();
 			screen.drawText("Reflexion", "Calcul de l'itin�raire", "en cours");
 			goals = findGoals();
 			ListIterator<String> li = goals.listIterator();
@@ -409,7 +439,7 @@ public class Controler {
 					pasDeProbleme = execute(goal);
 				}
 			}
-			//run = false;
+			// run = false;
 		}
 
 		/*
