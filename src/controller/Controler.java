@@ -64,7 +64,7 @@ public class Controler {
 		motors.add(graber);
 		distanceTot = 0;
 		runningTimeTot = 0;
-		timeForOneUnit = 1000;
+		timeForOneUnit = 2000;
 		vaPoser = false;
 		firstPass = true;
 		touche = false;
@@ -96,16 +96,16 @@ public class Controler {
 			} else {
 				seekLeft = false;
 			}
-			seekLeft = false;
+			// seekLeft = false;
 
 			camera.setSeekLeft(seekLeft);
 			screen.clearPrintln();
 			screen.clearDraw();
 			screen.drawText("Position", "< Gauche", "OK Milieu", "> Droite");
-			int btn =  input.waitAny();
+			int btn = input.waitAny();
 			if (btn == Button.ID_LEFT) {
 				myPos = new IntPoint(3, 0);
-			} else if (btn ==  Button.ID_RIGHT) {
+			} else if (btn == Button.ID_RIGHT) {
 				myPos = new IntPoint(9, 0);
 			} else if (btn == Button.ID_ENTER) {
 				myPos = new IntPoint(6, 0);
@@ -203,8 +203,7 @@ public class Controler {
 		// Recuperation des points
 		ArrayList<IntPoint> listPalets = camera.getPaletsPositions();
 		if (listPalets == null)
-			System.out.println("Pas de points recu par la camera");
-
+			return null;
 		// Recherche des action a effectuer
 		return s.findActions(myPos, listPalets);
 	}
@@ -253,7 +252,7 @@ public class Controler {
 			// if (pression.isPressed()) {
 			// arret des roues
 			// System.out.println("PRESSION");
-			
+
 			if (!touche) {
 				propulsion.runFor(800, true);
 				while (propulsion.isRunning()) {
@@ -264,7 +263,7 @@ public class Controler {
 					propulsion.checkState();
 				}
 			}
-						
+
 			elapsedTime = System.currentTimeMillis() - start;
 			majTimeToRunByUnit(distance, elapsedTime);
 			graber.close();
@@ -359,13 +358,13 @@ public class Controler {
 			System.out.println("distance: " + distance + " | timeByUnit: " + timeForOneUnit + " | ttl: " + ttl);
 			// avance jusqu'� toucher le palet
 			start = System.currentTimeMillis();
-			if(vaPoser) {
+			if (vaPoser) {
 				propulsion.run(true);
 			} else {
 				propulsion.runFor(ttl, true);
 			}
 			myPos = dest;
-			
+
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 				if ((!vaPoser && pression.isPressed()) || (vaPoser && color.getCurrentColor() == Color.WHITE)) {
@@ -430,16 +429,17 @@ public class Controler {
 			screen.clearDraw();
 			screen.drawText("Reflexion", "Calcul de l'itin�raire", "en cours");
 			goals = findGoals();
-			ListIterator<String> li = goals.listIterator();
-			while (li.hasNext() && pasDeProbleme) {
-				goal = li.next();
-				screen.drawText("Action", goal);
-				System.out.println(goal);
-				if (goal != null) {
-					pasDeProbleme = execute(goal);
+			if (goals != null) {
+				ListIterator<String> li = goals.listIterator();
+				while (li.hasNext() && pasDeProbleme) {
+					goal = li.next();
+					screen.drawText("Action", goal);
+					System.out.println(goal);
+					if (goal != null) {
+						pasDeProbleme = execute(goal);
+					}
 				}
 			}
-			// run = false;
 		}
 
 		/*
