@@ -110,6 +110,8 @@ public class Server extends Thread{
 
 	private void afficher(ArrayList<IntPoint> lastPointsReceived2) {
 		Traducteur t = new Traducteur();
+		t.setSeekLeft(true);	// a gauche
+		//t.setSeekLeft(false);	// a droite
 		System.out.println("Reception des points :");
 		for (IntPoint ip : t.traduire(lastPointsReceived2)) System.out.println(" - "+ip);
 	}
