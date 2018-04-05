@@ -31,10 +31,8 @@ public class Camera {
 	
 	synchronized public void receiveRawPoints(final ArrayList<IntPoint> PointsList) {
 		cleanHashMap();
-		//System.out.println("Reception des points :");
 		for(IntPoint tp : traducteur.traduire(PointsList)){
 			int valide = tp.getY();
-			//System.out.println(" - "+tp);
 			if (valide >0 && valide<12) {
 				masterList.add(tp);
 			}

@@ -8,14 +8,11 @@ public class Main {
 
 	public static void main(String[] args) {
 		Camera cam = new Camera();
-		//Camera cam = null;
 
-		// Lancement de la camera
-		Server s = new Server(cam, false);
+		// Lancement de la camera 1er boolean pour la calibration, 2nd pour l'affichage des points reçus
+		Server s = new Server(cam, false, false);
 		s.start();
-		
-		//System.out.println("END");
-		
+
 		//Lancement de la Brique
 		
 		Controler controler = new Controler(cam);

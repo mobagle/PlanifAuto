@@ -48,13 +48,16 @@ public class Server extends Thread{
 	private Camera camera;
 	
 	private boolean calibreTraducteur;
-
+	
+	private boolean affichage;
+	
 	/**
 	 * @param sl un objet (EyeOfMarvin dans ce cas) permettant de traiter la reception de la liste de points.
 	 */
-	public Server(Camera c, boolean calibrer){
+	public Server(Camera c, boolean calibrer, boolean affichage){
 		super("Server");
 		this.calibreTraducteur	= calibrer;
+		this.affichage			= affichage;
 		this.camera 			= c;
 		this.packet 			= new DatagramPacket(this.buffer, this.buffer.length);
 		this.lastPointsReceived	= new ArrayList<IntPoint>();
@@ -98,9 +101,17 @@ public class Server extends Thread{
 				//System.out.println("[SERVER]                : Cam calibre");
 			}
 			else this.camera.receiveRawPoints(this.lastPointsReceived);
+			
+			if (affichage) afficher(this.lastPointsReceived);
 			this.packet.setLength(this.buffer.length);
 		}
 		//System.out.println("[SERVER]                : Finished");
+	}
+
+	private void afficher(ArrayList<IntPoint> lastPointsReceived2) {
+		Traducteur t = new Traducteur();
+		System.out.println("Reception des points :");
+		for (IntPoint ip : t.traduire(lastPointsReceived2)) System.out.println(" - "+ip);
 	}
 
 	@Override
