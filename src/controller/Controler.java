@@ -97,8 +97,6 @@ public class Controler {
 			}
 			seekLeft = false;
 
-			// camera.setSeekLeft(seekLeft);
-			//propulsion.seDegreeToNorth(270);
 			camera.setSeekLeft(seekLeft);
 			mainLoop();
 		}
@@ -386,6 +384,7 @@ public class Controler {
 		ArrayList<String> goals = new ArrayList<>();
 		String goal;
 		propulsion.seDegreeToNorth(0);
+		/*
 		 goals.add("deplacement 6 0 9 6"); goals.add("prendrepalet");
 		 goals.add("deplacement 9 6 9 12"); goals.add("lacherpalet");
 		 
@@ -394,13 +393,13 @@ public class Controler {
 		 
 		 goals.add("deplacement 3 12 9 9"); goals.add("prendrepalet");
 		 goals.add("deplacement 9 9 9 12"); goals.add("lacherpalet");
-		 /* goals.add("deplacement 2 0 3 0"); goals.add("lacherpalet");
+		  goals.add("deplacement 2 0 3 0"); goals.add("lacherpalet");
 		 * goals.add("deplacement 0 0 0 3"); goals.add("prendrepalet");
 		 * goals.add("deplacement 0 0 3 0"); goals.add("lacherpalet");
 		 */
 		while (run) {
 			screen.drawText("Reflexion", "Calcul de l'itin�raire", "en cours");
-			//goals = findGoals();
+			goals = findGoals();
 			ListIterator<String> li = goals.listIterator();
 			while (li.hasNext() && pasDeProbleme) {
 				goal = li.next();
@@ -410,7 +409,7 @@ public class Controler {
 					pasDeProbleme = execute(goal);
 				}
 			}
-			run = false;
+			//run = false;
 		}
 
 		/*

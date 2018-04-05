@@ -17,14 +17,14 @@ public class Main {
 		//System.out.println("END");
 		
 		//Lancement de la Brique
-		/*
+		
 		Controler controler = new Controler(cam);
 		try{
 			controler.start();
 		}catch(Throwable e){
 			e.printStackTrace();
 			Delay.msDelay(10000);
-		}*/
+		}
 		//System.exit(0);
 	}
 
