@@ -23,14 +23,12 @@ public class Traducteur {
 	private final String filename = "./cam.calibre";
 	
 	Traducteur() {
-		seekLeft = false;
-		System.out.println("seekLeft : "+seekLeft);
 		recupererCalibrage();
 	}
 	
 	public void setSeekLeft(boolean b) {
 		seekLeft = b;
-		System.out.println("seekLeft : "+seekLeft);
+		//System.out.println("seekLeft : "+seekLeft);
 	}
 	
 	private void recupererCalibrage() {
@@ -74,29 +72,25 @@ public class Traducteur {
 	
 	public void calibrer(ArrayList<IntPoint> lastPointsReceived) {
 		IntPoint[] tabPoints = getTab(lastPointsReceived); // {0,0; 12,0; 0,12; 12,12; 6,6} 
-		//try {
-				X[0] = moyenne(tabPoints[0].getX(), tabPoints[2].getX());
-				X[6] = tabPoints[4].getX();
-				X[12] = moyenne(tabPoints[1].getX(), tabPoints[3].getX());
-				Y[0] = moyenne(tabPoints[0].getY(), tabPoints[1].getY());
-				Y[6] = tabPoints[4].getY();
-				Y[12] = moyenne(tabPoints[2].getY(), tabPoints[3].getY());
+		X[0] = moyenne(tabPoints[0].getX(), tabPoints[2].getX());
+		X[6] = tabPoints[4].getX();
+		X[12] = moyenne(tabPoints[1].getX(), tabPoints[3].getX());
+		Y[0] = moyenne(tabPoints[0].getY(), tabPoints[1].getY());
+		Y[6] = tabPoints[4].getY();
+		Y[12] = moyenne(tabPoints[2].getY(), tabPoints[3].getY());
 
-				// 0 et 12 sont déja initialisé
-				for(int i=1; i<12; i++) {
-					if (i != 6) {
-						X[i] = moyenne(X[0] + i*2*deltaX, X[12] - (24-(i*2))*deltaX);
-						Y[i] = moyenne(Y[0] + i*2*deltaY, Y[12] - (24-(i*2))*deltaY);
-						System.out.println("X["+i+"] = "+X[i]+" ,Y["+i+"] = "+Y[i]);
-					} else {
-						if (X[i] > X[i-1] + 3*deltaX) System.out.println("TRADUCTEUR : Probleme Calibration de X");
-						if (Y[i] > Y[i-1] + 3*deltaY) System.out.println("TRADUCTEUR : Probleme Calibration de Y");
-					}
-				}
-				saveCalibrage();
-		//} catch (Exception e) {
-			//System.out.println("TRADUCTEUR : Exception dans le calibrage");
-		//}
+		// 0 et 12 sont déja initialisé
+		for(int i=1; i<12; i++) {
+			if (i != 6) {
+				X[i] = moyenne(X[0] + i*2*deltaX, X[12] - (24-(i*2))*deltaX);
+				Y[i] = moyenne(Y[0] + i*2*deltaY, Y[12] - (24-(i*2))*deltaY);
+				System.out.println("X["+i+"] = "+X[i]+" ,Y["+i+"] = "+Y[i]);
+			} else {
+				if (X[i] > X[i-1] + 2.5*deltaX) System.out.println("TRADUCTEUR : Probleme Calibration de X");
+				if (Y[i] > Y[i-1] + 2.5*deltaY) System.out.println("TRADUCTEUR : Probleme Calibration de Y");
+			}
+		}
+		saveCalibrage();
 	}
 
 	// Retourne IntPoint[] trié : 0,0 12,0 0,12 12,12 6,6 
@@ -119,11 +113,8 @@ public class Traducteur {
 				tab[4] = ip;
 			}
 		}
-		//for(int i=0;i<5;i++) System.out.println("tab[i]"+tab[i]);
 		return tab;
 	}
-
-
 
 	public ArrayList<IntPoint> traduire(ArrayList<IntPoint> lastPointsReceived) {
 		ArrayList<IntPoint> liste = new ArrayList<>();
@@ -133,7 +124,7 @@ public class Traducteur {
 	}
 
 	private IntPoint traductionPoint(IntPoint intPoint) {
-		int newX = 12-findX(intPoint.getX());
+		int newX = 12-findX(intPoint.getX()); // -12 Pour que x = 0 soit toujours à notre droite
 		int newY = findY(intPoint.getY());
 		if (!seekLeft && newX!=-1 && newY!=-1) {
 			newX = 12-newX;
@@ -142,10 +133,9 @@ public class Traducteur {
 		return new IntPoint(newX, newY);
 	}
 	
-	private int findX(int x) {/*
-		if (x > X[3]-(1.5*deltaX) && x <= X[3]+(1.5*deltaX)) return 3;
-		else if (x > X[6]-(1.5*deltaX) && x <= X[6]+(1.5*deltaX)) return 6;
-		else */if (x > X[9]-(2*deltaX) && x <= X[9]+(2*deltaX)) return 9;
+	private int findX(int x) {
+		// Regle un de déformation de la camera
+		if (x > X[9]-(2*deltaX) && x <= X[9]+(2*deltaX)) return 9;
 		for(int i=0;i<13;i++) {
 			if (x > X[i]-deltaX && x <= X[i]+deltaX)
 				return i;
@@ -153,10 +143,9 @@ public class Traducteur {
 		return -1;
 	}
 
-	private int findY(int y) {/*
-		if (y > Y[3]-(1.5*deltaY) && y <= Y[3]+(1.5*deltaY)) return 3;
-		else if (y > Y[6]-(1.5*deltaY) && y <= Y[6]+(1.5*deltaY)) return 6;
-		else*/if (y > Y[9]-(2*deltaY) && y <= Y[9]+(2*deltaY)) return 9;
+	private int findY(int y) {
+		// Regle un de déformation de la camera
+		if (y > Y[9]-(2*deltaY) && y <= Y[9]+(2*deltaY)) return 9;
 		for(int i=0;i<13;i++) {
 			if (y > Y[i]-deltaY && y <= Y[i]+deltaY)
 				return i;

@@ -49,15 +49,15 @@ public class Server extends Thread{
 	
 	private boolean calibreTraducteur;
 	
-	private boolean affichage;
+	private boolean isarobot;
 	
 	/**
 	 * @param sl un objet (EyeOfMarvin dans ce cas) permettant de traiter la reception de la liste de points.
 	 */
-	public Server(Camera c, boolean calibrer, boolean affichage){
+	public Server(Camera c, boolean calibrer, boolean robot){
 		super("Server");
 		this.calibreTraducteur	= calibrer;
-		this.affichage			= affichage;
+		this.isarobot			= robot;
 		this.camera 			= c;
 		this.packet 			= new DatagramPacket(this.buffer, this.buffer.length);
 		this.lastPointsReceived	= new ArrayList<IntPoint>();
@@ -75,6 +75,44 @@ public class Server extends Thread{
 	 */
 	@Override
 	public void run() {
+		if (isarobot) serverRobot();
+		else serverMecano();		
+	}
+
+	public void serverMecano(){
+		this.setPriority(Thread.NORM_PRIORITY);
+		while(! isInterrupted() && !this.stop){
+			try {
+				this.dsocket.receive(this.packet);
+			} catch (IOException e) {
+				this.stop = true;
+			}
+			String msg = new String(this.buffer, 0, this.packet.getLength());
+			String[] items = msg.split("\n");
+			this.lastPointsReceived.clear();
+			for (int i = 0; i < items.length; i++) {
+				String[] coord = items[i].split(";");
+				if(coord.length == 3){
+		        	int x = Integer.parseInt(coord[1]);
+		        	int y = Integer.parseInt(coord[2]);
+		        	this.lastPointsReceived.add(new IntPoint(x, y));
+				}
+	        }
+			afficher(this.lastPointsReceived);
+			this.packet.setLength(this.buffer.length);
+		}
+	}
+	
+	private void afficher(ArrayList<IntPoint> packet) {
+		Traducteur t = new Traducteur();
+		t.setSeekLeft(true);	// a gauche de la camera
+		//t.setSeekLeft(false);	// a droite de la camera
+		System.out.println("Reception des points :");
+		for (IntPoint ip : t.traduire(packet)) System.out.println(" - "+ip);
+	}
+		
+		
+	public void serverRobot(){
 		//System.out.println("[SERVER]                : Started");
 		this.setPriority(Thread.NORM_PRIORITY);
 		while(! isInterrupted() && !this.stop){
@@ -98,22 +136,10 @@ public class Server extends Thread{
 			if (calibreTraducteur) {
 				this.camera.calibrer(this.lastPointsReceived);
 				calibreTraducteur = false;
-				//System.out.println("[SERVER]                : Cam calibre");
 			}
 			else this.camera.receiveRawPoints(this.lastPointsReceived);
-			
-			if (affichage) afficher(this.lastPointsReceived);
 			this.packet.setLength(this.buffer.length);
 		}
-		//System.out.println("[SERVER]                : Finished");
-	}
-
-	private void afficher(ArrayList<IntPoint> lastPointsReceived2) {
-		Traducteur t = new Traducteur();
-		t.setSeekLeft(true);	// a gauche
-		//t.setSeekLeft(false);	// a droite
-		System.out.println("Reception des points :");
-		for (IntPoint ip : t.traduire(lastPointsReceived2)) System.out.println(" - "+ip);
 	}
 
 	@Override
