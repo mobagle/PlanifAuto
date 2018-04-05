@@ -80,6 +80,7 @@ public class Server extends Thread{
 			} catch (IOException e) {
 				this.stop = true;
 			}
+			System.out.println("[SERVER]                : Packet receive");
 			String msg = new String(this.buffer, 0, this.packet.getLength());
 			String[] items = msg.split("\n");
 			this.lastPointsReceived.clear();
