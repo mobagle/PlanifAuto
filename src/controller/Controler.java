@@ -342,7 +342,7 @@ public class Controler {
 			propulsion.runFor(ttl, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
-				if (!vaPoser && pression.isPressed()) {
+				if ((!vaPoser && pression.isPressed()) || (vaPoser && color.getCurrentColor() == Color.WHITE)) {
 					propulsion.stopMoving();
 					return true;
 				}
