@@ -105,8 +105,8 @@ public class Server extends Thread{
 	
 	private void afficher(ArrayList<IntPoint> packet) {
 		Traducteur t = new Traducteur();
-		t.setSeekLeft(true);	// a gauche de la camera
-		//t.setSeekLeft(false);	// a droite de la camera
+		//t.setSeekLeft(true);	// a gauche de la camera
+		t.setSeekLeft(false);	// a droite de la camera
 		System.out.println("Reception des points :");
 		for (IntPoint ip : t.traduire(packet)) System.out.println(" - "+ip);
 	}
