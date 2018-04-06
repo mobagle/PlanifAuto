@@ -135,7 +135,8 @@ public class Traducteur {
 	
 	private int findX(int x) {
 		// Regle un de déformation de la camera
-		if (x > X[9]-(2*deltaX) && x <= X[9]+(2*deltaX)) return 9;
+		if (x > X[9]-(1.5*deltaX) && x <= X[9]+(1.5*deltaX)) return 9;
+		else if (x > Y[3]-(1.5*deltaY) && x <= Y[3]+(1.5*deltaY)) return 3;
 		for(int i=0;i<13;i++) {
 			if (x > X[i]-deltaX && x <= X[i]+deltaX)
 				return i;
@@ -145,7 +146,8 @@ public class Traducteur {
 
 	private int findY(int y) {
 		// Regle un de déformation de la camera
-		if (y > Y[9]-(2*deltaY) && y <= Y[9]+(2*deltaY)) return 9;
+		if (y > Y[9]-(1.5*deltaY) && y <= Y[9]+(1.5*deltaY)) return 9;
+		else if (y > Y[3]-(1.5*deltaY) && y <= Y[3]+(1.5*deltaY)) return 3;
 		for(int i=0;i<13;i++) {
 			if (y > Y[i]-deltaY && y <= Y[i]+deltaY)
 				return i;
