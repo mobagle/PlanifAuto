@@ -310,7 +310,7 @@ public class Controler {
 			if (angle < 0)
 				left = true;
 
-			propulsion.rotate(Math.abs(angle), left, true);
+			propulsion.rotate(Math.abs(angle)+2, left, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
@@ -380,7 +380,7 @@ public class Controler {
 		int angle = degrees + myOrientation;
 		angle = angle % 360;
 		if (angle > 180) angle -= 360;
-		if (myPos.getX() > dest.getX()) {
+		if (myPos.getX() < dest.getX()) {
 			angle = -angle;
 		}
 		boolean left = false;
