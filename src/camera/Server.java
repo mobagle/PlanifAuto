@@ -67,7 +67,6 @@ public class Server extends Thread{
 			System.out.println("[SERVER]                : Erreur, DatagramSocket non initialisé");
 			e1.printStackTrace();
 		}
-		//System.out.println("[SERVER]                : Initialized");
 	}
 			
 	/**
@@ -113,7 +112,6 @@ public class Server extends Thread{
 		
 		
 	public void serverRobot(){
-		//System.out.println("[SERVER]                : Started");
 		this.setPriority(Thread.NORM_PRIORITY);
 		while(! isInterrupted() && !this.stop){
 			try {
@@ -121,7 +119,6 @@ public class Server extends Thread{
 			} catch (IOException e) {
 				this.stop = true;
 			}
-			//System.out.println("[SERVER]                : Packet receive");
 			String msg = new String(this.buffer, 0, this.packet.getLength());
 			String[] items = msg.split("\n");
 			this.lastPointsReceived.clear();
