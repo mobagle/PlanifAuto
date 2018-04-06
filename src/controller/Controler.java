@@ -191,8 +191,9 @@ public class Controler {
 
 		// Recuperation des points
 		ArrayList<IntPoint> listPalets = camera.getPaletsPositions();
-		if (listPalets == null) return null; // Plus de palet sur la table
-		
+		if (listPalets == null)
+			return null; // Plus de palet sur la table
+
 		// Recherche des action a effectuer
 		return s.findActions(myPos, listPalets);
 	}
@@ -214,154 +215,202 @@ public class Controler {
 		for (TImedMotor m : motors)
 			m.checkState();
 		switch (action[0]) {
-			case "prendrepalet":
-				/*
-				 * double distance = distance(myPos, dest); int ttl = (int)(timeForOneUnit *
-				 * distance); // avance jusqu'ï¿½ toucher le palet
-				 * 
-				 * propulsion.runFor(ttl,true); while (propulsion.isRunning()) {
-				 * propulsion.checkState();
-				 *
-				 * if(vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des
-				 * roues propulsion.stopMoving(); System.out.println("COLLISION"); return false;
-				 * } else
-				 *
-				 * 
-				 * }
-				 */
-	
-				// if(vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des
-				// roues
-				// propulsion.stopMoving();
-				// System.out.println("COLLISION");
-				// return false;
-				// }
-	
-				// if (pression.isPressed()) {
-				// arret des roues
-				// System.out.println("PRESSION");
-	
-				if (!touche) {
-					propulsion.runFor(800, true);
-					while (propulsion.isRunning()) {
-						if (pression.isPressed()) {
-							propulsion.stopMoving();
+		case "prendrepalet":
+			/*
+			 * 
+			 * if(vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des
+			 * roues propulsion.stopMoving(); System.out.println("COLLISION"); return false;
+			 * }
+			 */
+
+			if (!touche) {
+				propulsion.runFor(800, true);
+				while (propulsion.isRunning()) {
+					if (pression.isPressed()) {
+						propulsion.stopMoving();
+						break;
+					}
+					propulsion.checkState();
+				}
+			}
+
+			elapsedTime = System.currentTimeMillis() - start;
+			majTimeToRunByUnit(distance, elapsedTime);
+			graber.close();
+			// attend la fin de la fermeture des pinces
+			while (graber.isRunning()) {
+				graber.checkState();
+			}
+			vaPoser = true;
+			return true;
+
+		case "lacherpalet":
+
+			propulsion.runFor(400, true);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+			}
+			// ouvre les pinces
+			graber.open();
+			// attend la fin de l'ouverture des pinces
+			while (graber.isRunning()) {
+				graber.checkState();
+			}
+
+			// recule apres avoir lacher le palet
+			propulsion.runFor(400, false);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+			}
+			/*
+			 * propulsion.rotate(180, true, false); while (propulsion.isRunning()) {
+			 * propulsion.checkState(); }
+			 */
+
+			vaPoser = false;
+			firstPass = false;
+			return true;
+
+		case "deplacement":
+			touche = false;
+			// initialisation des points
+			x0 = Integer.valueOf(action[1]);
+			y0 = Integer.valueOf(action[2]);
+			x1 = Integer.valueOf(action[3]);
+			y1 = Integer.valueOf(action[4]);
+			myPos = new IntPoint(x0, y0);
+			dest = new IntPoint(x1, y1);
+			IntPoint north = new IntPoint(x0, 16);
+			// rotation
+
+			int degrees = angle(myPos, dest, north);
+			// System.out.println("computed angle: " + degrees);
+
+			int myOrientation = (int) propulsion.getRotateToNorth();
+			// System.out.println("my orientation: " + myOrientation);
+
+			int angle = degrees + myOrientation;
+			angle = angle % 360;
+			if (angle > 180)
+				angle -= 360;
+
+			if (!vaPoser && !firstPass) {
+				if (x0 > x1) {
+					angle = -angle;
+					aGauche = true;
+				} else {
+					aGauche = false;
+				}
+			} else if (vaPoser && !firstPass && aGauche) {
+				angle = Math.abs(angle);
+			}
+			// System.out.println("angle corrected: " + angle);
+
+			boolean left = false;
+			if (angle < 0)
+				left = true;
+
+			propulsion.rotate(Math.abs(angle), left, true);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+			}
+
+			distance = distance(myPos, dest);
+			int ttl = (int) (timeForOneUnit * distance);
+			System.out.println("distance: " + distance + " | timeByUnit: " + timeForOneUnit + " | ttl: " + ttl);
+			start = System.currentTimeMillis();
+
+			// si le robot doit ramener le palet
+			if (vaPoser) {
+				boolean obsturct = false;
+				if (firstPass) {
+					ArrayList<IntPoint> points = camera.getPaletsPositions();
+					for (IntPoint point : points) {
+						if (point.getX() == myPos.getX() && point.getY() > myPos.getY()) {
+							obsturct = true;
 							break;
 						}
-						propulsion.checkState();
 					}
 				}
-	
-				elapsedTime = System.currentTimeMillis() - start;
-				majTimeToRunByUnit(distance, elapsedTime);
-				graber.close();
-				// attend la fin de la fermeture des pinces
-				while (graber.isRunning()) {
-					graber.checkState();
-				}
-				vaPoser = true;
-				return true;
-	
-			case "lacherpalet":
-				/*
-				 * while (propulsion.isRunning()) { propulsion.checkState(); if
-				 * (vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des roues
-				 * propulsion.stopMoving(); return false; } }
-				 */
-				propulsion.runFor(400, true);
-				while (propulsion.isRunning()) {
-					propulsion.checkState();
-				}
-				// ouvre les pinces
-				graber.open();
-				// attend la fin de l'ouverture des pinces
-				while (graber.isRunning()) {
-					graber.checkState();
-				}
-	
-				// recule apres avoir lacher le palet
-				propulsion.runFor(400, false);
-				while (propulsion.isRunning()) {
-					propulsion.checkState();
-				}
-				/*
-				 * propulsion.rotate(180, true, false); while (propulsion.isRunning()) {
-				 * propulsion.checkState(); }
-				 */
-	
-				vaPoser = false;
-				firstPass = false;
-				return true;
-	
-			case "deplacement":
-				touche = false;
-				// initialisation des points
-				x0 = Integer.valueOf(action[1]);
-				y0 = Integer.valueOf(action[2]);
-				x1 = Integer.valueOf(action[3]);
-				y1 = Integer.valueOf(action[4]);
-				myPos = new IntPoint(x0, y0);
-				dest = new IntPoint(x1, y1);
-				int nextY = 16;
-				IntPoint north = new IntPoint(x0, nextY);
-				// rotation
-	
-				int degrees = angle(myPos, dest, north);
-				System.out.println("computed angle: " + degrees);
-	
-				int myOrientation = (int) propulsion.getRotateToNorth();
-				System.out.println("my orientation: " + myOrientation);
-	
-				int angle = degrees + myOrientation;
-				angle = angle % 360;
-				if (angle > 180)
-					angle -= 360;
-	
-				if (!vaPoser && !firstPass) {
-					if (x0 > x1) {
-						angle = -angle;
-						aGauche = true;
-					} else {
-						aGauche = false;
-					}
-				} else if (vaPoser && !firstPass && aGauche) {
-					angle = Math.abs(angle);
-				}
-				System.out.println("angle corrected: " + angle);
-	
-				boolean left = false;
-				if (angle < 0)
-					left = true;
-	
-				propulsion.rotate(Math.abs(angle), left, true);
-				while (propulsion.isRunning()) {
-					propulsion.checkState();
-				}
-	
-				distance = distance(myPos, dest);
-				int ttl = (int) (timeForOneUnit * distance);
-				System.out.println("distance: " + distance + " | timeByUnit: " + timeForOneUnit + " | ttl: " + ttl);
-				// avance jusqu'a toucher le palet
-				start = System.currentTimeMillis();
-				if (vaPoser) {
-					propulsion.run(true);
+				// si le chemin vers le camp adverse est obstrué
+				if (obsturct) {
+					avoidObstruct();
+					return true;
 				} else {
-					propulsion.runFor(ttl, true);
+					propulsion.run(true);
 				}
-				myPos = dest;
-	
-				while (propulsion.isRunning()) {
-					propulsion.checkState();
-					if ((!vaPoser && pression.isPressed()) || (vaPoser && color.getCurrentColor() == Color.WHITE)) {
-						touche = true;
-						propulsion.stopMoving();
-						return true;
-					}
+				// si le robot va chercher un palet
+			} else {
+				propulsion.runFor(ttl, true);
+			}
+			myPos = dest;
+
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+				// conditions d'arret des roues
+				if ((!vaPoser && pression.isPressed()) || (vaPoser && color.getCurrentColor() == Color.WHITE)) {
+					touche = true;
+					propulsion.stopMoving();
+					return true;
 				}
-				return true;
-			default:
-				return false;
+			}
+			return true;
+		default:
+			return false;
 		}
+	}
+
+	/**
+	 * permet au robot de poser le palet en prennant une diagonale au lieu d'aller
+	 * tout droit dans le cas ou il y a d'autres palets sur l'axe x le mennant au
+	 * camp adverse
+	 */
+	private void avoidObstruct() {
+		// calcul de la nouvelle destination
+		if (dest.getX() > 3) {
+			dest.setX(dest.getX() - 3);
+		} else {
+			dest.setX(6);
+		}
+
+		// calcul de l'angle pour atteindre la nouvelle destination
+		IntPoint north = new IntPoint(myPos.getX(), 16);
+		int degrees = angle(myPos, dest, north);
+		int myOrientation = (int) propulsion.getRotateToNorth();
+		int angle = degrees + myOrientation;
+		angle = angle % 360;
+		if (angle > 180) angle -= 360;
+		if (myPos.getX() > dest.getX()) {
+			angle = -angle;
+		}
+		boolean left = false;
+		if (angle < 0)
+			left = true;
+
+		//exécute une roation pour se positionner face à sa destination
+		propulsion.rotate(Math.abs(angle)+2, left, true);
+		while (propulsion.isRunning()) {
+			propulsion.checkState();
+		}
+
+		//avance tout droit jusqu'à trouver la ligne blanche 
+		propulsion.run(true);
+		while (propulsion.isRunning()) {
+			propulsion.checkState();
+			if (color.getCurrentColor() == Color.WHITE) {
+				propulsion.stopMoving();
+			}
+		}
+		
+		//se repositionne face au camp adverse
+		propulsion.rotate(Math.abs(angle)+2, !left, true);
+		while (propulsion.isRunning()) {
+			propulsion.checkState();
+		}
+
+		//mets à jour la position actuelle
+		myPos = dest;
+
 	}
 
 	/** retourne la distance absolue entre les points p1 et p2 */
@@ -371,7 +420,7 @@ public class Controler {
 
 	/**
 	 * retourne la distance absolue entre les points p1 et p2 dans la grille pas
-	 * carrï¿½e
+	 * carre (50cm * 60cm)
 	 */
 	private double distance(IntPoint p1, IntPoint p2) {
 		double etirementY = 1.2;
@@ -399,7 +448,8 @@ public class Controler {
 			screen.clearDraw();
 			screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
 			goals = findGoals();
-			if (goals == null) run = false;
+			if (goals == null)
+				run = false;
 			else {
 				for (String goal : goals) {
 					screen.drawText("Action", goal);
