@@ -35,6 +35,7 @@ public class Controler {
 	protected Screen screen = null;
 	protected InputHandler input = null;
 	protected Camera camera = null;
+	protected ActionsGiver actionsGiver = null;
 	public static boolean seekLeft;
 	private IntPoint myPos;
 	private IntPoint dest;
@@ -59,6 +60,7 @@ public class Controler {
 		vision = new VisionSensor();
 		screen = new Screen();
 		camera = cam;
+		actionsGiver = new ActionsGiver(cam);
 		input = new InputHandler(screen);
 		motors.add(propulsion);
 		motors.add(graber);
@@ -181,21 +183,6 @@ public class Controler {
 	@SuppressWarnings("unused")
 	private void runTests() {
 		SystemTest.grabberTest(this);
-	}
-
-	/**
-	 * Lance pdll pour trouver les actions Ã  effectuer
-	 */
-	private ArrayList<String> findGoals() {
-		Solver s = new Solver();
-
-		// Recuperation des points
-		ArrayList<IntPoint> listPalets = camera.getPaletsPositions();
-		if (listPalets == null)
-			return null; // Plus de palet sur la table
-
-		// Recherche des action a effectuer
-		return s.findActions(myPos, listPalets);
 	}
 
 	/** Mets ï¿½ jour le temps moyen nï¿½cessaire pour avancer d'une unitï¿½ */
@@ -332,7 +319,7 @@ public class Controler {
 						}
 					}
 				}
-				// si le chemin vers le camp adverse est obstrué
+				// si le chemin vers le camp adverse est obstruï¿½
 				if (obsturct) {
 					avoidObstruct();
 					return true;
@@ -387,13 +374,13 @@ public class Controler {
 		if (angle < 0)
 			left = true;
 
-		//exécute une roation pour se positionner face à sa destination
+		//exï¿½cute une roation pour se positionner face ï¿½ sa destination
 		propulsion.rotate(Math.abs(angle)+2, left, true);
 		while (propulsion.isRunning()) {
 			propulsion.checkState();
 		}
 
-		//avance tout droit jusqu'à trouver la ligne blanche 
+		//avance tout droit jusqu'ï¿½ trouver la ligne blanche 
 		propulsion.run(true);
 		while (propulsion.isRunning()) {
 			propulsion.checkState();
@@ -408,7 +395,7 @@ public class Controler {
 			propulsion.checkState();
 		}
 
-		//mets à jour la position actuelle
+		//mets ï¿½ jour la position actuelle
 		myPos = dest;
 
 	}
@@ -441,13 +428,20 @@ public class Controler {
 	private void mainLoop() {
 		boolean run = true;
 		boolean pasDeProbleme = true;
-		ArrayList<String> goals = new ArrayList<>();
 		propulsion.seDegreeToNorth(0);
+
+		screen.clearPrintln();
+		screen.clearDraw();
+		screen.drawText("Reflexion", "Calcul du 1er itineraire", "en cours");
+		ArrayList<String> goals = actionsGiver.findGoals(this.myPos);
+		
+		screen.clearPrintln();
+		screen.clearDraw();
+		screen.drawText("GO ?");
+		
+		input.waitAny();
 		while (run) {
-			screen.clearPrintln();
-			screen.clearDraw();
-			screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
-			goals = findGoals();
+
 			if (goals == null)
 				run = false;
 			else {
@@ -458,6 +452,10 @@ public class Controler {
 						pasDeProbleme = execute(goal);
 					}
 				}
+				screen.clearPrintln();
+				screen.clearDraw();
+				screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
+				goals = actionsGiver.findGoals();
 			}
 		}
 	}

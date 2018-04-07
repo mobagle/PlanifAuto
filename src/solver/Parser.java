@@ -2,8 +2,6 @@ package solver;
 
 import java.util.ArrayList;
 
-import vue.Screen;
-
 public class Parser {
 
 	/* Fonction principale, transforme le String (Json) en ArrayList d'actions à effectuer */
