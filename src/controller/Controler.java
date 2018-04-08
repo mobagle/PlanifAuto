@@ -456,7 +456,7 @@ public class Controler {
 				screen.clearPrintln();
 				screen.clearDraw();
 				screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
-				goals = actionsGiver.findGoals();
+				goals = actionsGiver.findGoals(this.myPos);
 			}
 		}
 	}

@@ -10,13 +10,13 @@ public class AGExpert extends Thread implements ActionsGiver {
 	
 	private Camera camera;
 	
+	private Solver s;
+	
 	private IntPoint lastPalet;
 	
 	private IntPoint lastPosition;
 	
 	private ArrayList<String> res;
-	
-	private Solver s;
 	
 	public AGExpert(Camera c) {
 		camera = c;
@@ -24,21 +24,17 @@ public class AGExpert extends Thread implements ActionsGiver {
 	}
 	
 	public ArrayList<String> findGoals(IntPoint myPos) {
-		// Recuperation des points
-		ArrayList<IntPoint> listPalets = camera.getPaletsPositions();
-		
-		// Recherche des action a effectuer
-		res = s.findActions(myPos, listPalets);
-		lastPalet = paletTake(res);
-		lastPosition = lastPos(res);
-
-		return findGoals();
-	}
-	
-	public ArrayList<String> findGoals() {
+		if (!myPos.equals(lastPosition)) { // Le pré calcul est parti d'une mauvaise position, on recalcul
+			lastPosition = myPos;
+			lastPalet = null;
+			res = null;
+			run();
+		}
+		ArrayList<String> resultat = (ArrayList<String>) this.res.clone();
 		this.start();
-		return (ArrayList<String>) this.res.clone();
+		return resultat;
 	}
+
 	
 	/**
 	 * Lance pdll pour trouver les actions à effectuer
@@ -46,18 +42,17 @@ public class AGExpert extends Thread implements ActionsGiver {
 	public void run() {
 		// Recuperation des points
 		ArrayList<IntPoint> listPalets = camera.getPaletsPositions();
-		if (listPalets == null) {	// Plus de palet sur la table
+		if (listPalets.size() == 0) {	// Plus de palet sur la table
 			res = null;
-			//lastPalet = null;
-			//lastPosition = null;
+			lastPalet = null;
+			lastPosition = null;
 		} else {
 			// Supprime le palet en cours de déplacement
-			
 			if (lastPalet != null) enleverPalet(listPalets, lastPalet);
-			// Recherche des action a effectuer
 			
+			// Recherche des action a effectuer
 			res = s.findActions(lastPosition, listPalets);
-			lastPalet = paletTake(res);
+			lastPalet = paletTake(res);	// Mise en place de la prochaine recherche
 			lastPosition = lastPos(res);
 		}
 	}

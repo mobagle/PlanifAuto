@@ -58,17 +58,28 @@ public class IntPoint {
 	}
 	
 	@Override
-	public boolean equals(final Object  o){
-		if (!(o instanceof IntPoint)) {
-	        return false;
-	    }
-		IntPoint p = (IntPoint)o;
-		return (y == p.y && x == p.x);
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IntPoint other = (IntPoint) obj;
+		if (x != other.x)
+			return false;
+		if (y != other.y)
+			return false;
+		return true;
 	}
 	
 	@Override
 	public int hashCode() {
-		return (this.x) + (10000 * (this.y)); // parfait si x et y < 10000...
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + x;
+		result = prime * result + y;
+		return result;
 	}
 	
 	/**
