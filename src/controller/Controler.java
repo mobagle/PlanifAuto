@@ -60,7 +60,8 @@ public class Controler {
 		vision = new VisionSensor();
 		screen = new Screen();
 		camera = cam;
-		actionsGiver = new ActionsGiver(cam);
+		FactoryAG fag = new FactoryAG(false);
+		actionsGiver = fag.createActionGiver(cam);
 		input = new InputHandler(screen);
 		motors.add(propulsion);
 		motors.add(graber);
