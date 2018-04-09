@@ -14,6 +14,8 @@ public class AGExpert extends Thread implements ActionsGiver {
 	
 	private IntPoint lastPalet;
 	
+	private IntPoint position;
+	
 	private IntPoint lastPosition;
 	
 	private ArrayList<String> res;
@@ -25,7 +27,8 @@ public class AGExpert extends Thread implements ActionsGiver {
 	
 	public ArrayList<String> findGoals(IntPoint myPos) {
 		if (!myPos.equals(lastPosition)) { // Le pré calcul est parti d'une mauvaise position, on recalcul
-			lastPosition = myPos;
+			position = myPos;
+			lastPosition = null;
 			lastPalet = null;
 			res = null;
 			run();
@@ -51,9 +54,10 @@ public class AGExpert extends Thread implements ActionsGiver {
 			if (lastPalet != null) enleverPalet(listPalets, lastPalet);
 			
 			// Recherche des action a effectuer
-			res = s.findActions(lastPosition, listPalets);
+			res = s.findActions(position, listPalets);
 			lastPalet = paletTake(res);	// Mise en place de la prochaine recherche
-			lastPosition = lastPos(res);
+			lastPosition = position;
+			position = lastPos(res);
 		}
 	}
 
