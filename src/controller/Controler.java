@@ -34,7 +34,6 @@ public class Controler {
 	protected VisionSensor vision = null;
 	protected Screen screen = null;
 	protected InputHandler input = null;
-	protected Camera camera = null;
 	protected ActionsGiver actionsGiver = null;
 	public static boolean seekLeft;
 	private IntPoint myPos;
@@ -59,7 +58,6 @@ public class Controler {
 		pression = new PressionSensor();
 		vision = new VisionSensor();
 		screen = new Screen();
-		camera = cam;
 		FactoryAG fag = new FactoryAG(false);
 		actionsGiver = fag.createActionGiver(cam);
 		input = new InputHandler(screen);
@@ -100,7 +98,7 @@ public class Controler {
 				seekLeft = false;
 			}
 
-			camera.setSeekLeft(seekLeft);
+			actionsGiver.setSeekLeft(seekLeft);
 			screen.clearPrintln();
 			screen.clearDraw();
 			screen.drawText("Position", "< Gauche", "OK Milieu", "> Droite");
@@ -310,23 +308,8 @@ public class Controler {
 
 			// si le robot doit ramener le palet
 			if (vaPoser) {
-				boolean obsturct = false;
-				if (firstPass) {
-					ArrayList<IntPoint> points = camera.getPaletsPositions();
-					for (IntPoint point : points) {
-						if (point.getX() == myPos.getX() && point.getY() > myPos.getY()) {
-							obsturct = true;
-							break;
-						}
-					}
-				}
-				// si le chemin vers le camp adverse est obstru�
-				if (obsturct) {
-					avoidObstruct();
-					return true;
-				} else {
-					propulsion.run(true);
-				}
+				avoidObstruct();
+				return true;
 				// si le robot va chercher un palet
 			} else {
 				propulsion.runFor(ttl, true);
@@ -433,16 +416,15 @@ public class Controler {
 
 		screen.clearPrintln();
 		screen.clearDraw();
-		screen.drawText("Reflexion", "Calcul du 1er itineraire", "en cours");
+		screen.drawText("Preparation !!");
 		ArrayList<String> goals = actionsGiver.findGoals(this.myPos);
 		
 		screen.clearPrintln();
 		screen.clearDraw();
-		screen.drawText("GO ?");
-		
+		screen.drawText("Let's go ?");
 		input.waitAny();
+		
 		while (run) {
-
 			if (goals == null)
 				run = false;
 			else {

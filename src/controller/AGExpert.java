@@ -10,7 +10,7 @@ public class AGExpert extends Thread implements ActionsGiver {
 	
 	private Camera camera;
 	
-	private Solver s;
+	private Solver solver;
 	
 	private IntPoint lastPalet;
 	
@@ -22,7 +22,7 @@ public class AGExpert extends Thread implements ActionsGiver {
 	
 	public AGExpert(Camera c) {
 		camera = c;
-		s = new Solver();
+		solver = new Solver();
 	}
 	
 	public ArrayList<String> findGoals(IntPoint myPos) {
@@ -54,7 +54,7 @@ public class AGExpert extends Thread implements ActionsGiver {
 			if (lastPalet != null) enleverPalet(listPalets, lastPalet);
 			
 			// Recherche des action a effectuer
-			res = s.findActions(position, listPalets);
+			res = solver.findActions(position, listPalets);
 			lastPalet = paletTake(res);	// Mise en place de la prochaine recherche
 			lastPosition = position;
 			position = lastPos(res);
@@ -84,12 +84,16 @@ public class AGExpert extends Thread implements ActionsGiver {
 		int nbAction = res.size();
 		String act = res.get(nbAction-1);
 		String[] s = act.split(" ");
-
 		if (s[0].equals("lacherpalet")) {
 			return new IntPoint(Integer.parseInt(s[1]), Integer.parseInt(s[2]));
 		} else {
 			System.out.println("PROBLEME ActionGiver recuperer lastPosition");
 			return null;
 		}
+	}
+	
+	@Override
+	public void setSeekLeft(boolean bool) {
+		camera.setSeekLeft(bool);
 	}
 }

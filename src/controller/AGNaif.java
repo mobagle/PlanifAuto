@@ -10,11 +10,11 @@ public class AGNaif implements ActionsGiver{
 
 	private Camera camera;
 	
-	private Solver s;
+	private Solver solver;
 		
 	public AGNaif(Camera c) {
 		camera = c;
-		s = new Solver();
+		solver = new Solver();
 	}
 	
 	public ArrayList<String> findGoals(IntPoint myPos) {
@@ -24,7 +24,11 @@ public class AGNaif implements ActionsGiver{
 		if (listPalets.size() == 0) return null;
 
 		// Recherche des action a effectuer
-		ArrayList<String> res = s.findActions(myPos, listPalets);
-		return res;
+		return solver.findActions(myPos, listPalets);
+	}
+
+	@Override
+	public void setSeekLeft(boolean bool) {
+		camera.setSeekLeft(bool);
 	}
 }
