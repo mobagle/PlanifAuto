@@ -433,9 +433,14 @@ public class Controler {
 
 		screen.clearPrintln();
 		screen.clearDraw();
-		screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
+		screen.drawText("Preparation !");
 		ArrayList<String> goals = actionGiver.findGoals(myPos);
 		
+		screen.clearPrintln();
+		screen.clearDraw();
+		screen.drawText("GO ? !");
+		input.waitAny();
+
 		propulsion.seDegreeToNorth(0);
 		while (run) {
 
