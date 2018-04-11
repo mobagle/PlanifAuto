@@ -8,17 +8,17 @@ import utils.IntPoint;
 
 public class AGExpert extends Thread implements ActionsGiver {
 	
-	private Camera camera;
+	public Camera camera;
 	
-	private Solver solver;
+	public Solver solver;
 	
-	private IntPoint lastPalet;
+	public IntPoint lastPalet;
 	
-	private IntPoint position;
+	public IntPoint position;
 	
-	private IntPoint lastPosition;
+	public IntPoint lastPosition;
 	
-	private ArrayList<String> res;
+	public ArrayList<String> res;
 	
 	public AGExpert(Camera c) {
 		camera = c;
@@ -33,9 +33,8 @@ public class AGExpert extends Thread implements ActionsGiver {
 			res = null;
 			run();
 		}
-		ArrayList<String> resultat = (ArrayList<String>) this.res.clone();
-		this.start();
-		return resultat;
+		if (res == null) return null;
+		return (ArrayList<String>) this.res.clone();
 	}
 
 	
@@ -95,5 +94,13 @@ public class AGExpert extends Thread implements ActionsGiver {
 	@Override
 	public void setSeekLeft(boolean bool) {
 		camera.setSeekLeft(bool);
+	}
+	
+	public AGExpert clone() {
+		AGExpert age = new AGExpert(this.camera);
+		age.lastPalet = this.lastPalet;
+		age.position = this.position;
+		age.lastPosition = this.lastPosition;
+		return age;
 	}
 }

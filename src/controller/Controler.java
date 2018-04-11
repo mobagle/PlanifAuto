@@ -50,17 +50,19 @@ public class Controler {
 	private boolean firstPass;
 	private boolean aGauche;
 	private boolean touche;
+	private boolean ag;
 
 	private ArrayList<TImedMotor> motors = new ArrayList<TImedMotor>();
 
-	public Controler(Camera cam) {
+	public Controler(Camera cam, boolean AGExpert) {
 		propulsion = new Propulsion();
 		graber = new Graber();
 		color = new ColorSensor();
 		pression = new PressionSensor();
 		vision = new VisionSensor();
 		screen = new Screen();
-		FactoryAG fag = new FactoryAG(false);
+		ag = AGExpert;
+		FactoryAG fag = new FactoryAG(AGExpert);
 		actionGiver = fag.createActionGiver(cam);
 		camera = cam;
 		input = new InputHandler(screen);
@@ -458,6 +460,10 @@ public class Controler {
 				screen.clearDraw();
 				screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
 				goals = actionGiver.findGoals(myPos);
+				if (ag) {
+					actionGiver = (ActionsGiver) (((AGExpert)actionGiver).clone());
+					((AGExpert) actionGiver).start();
+				}
 			}
 		}
 	}

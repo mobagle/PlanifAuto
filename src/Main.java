@@ -15,7 +15,7 @@ public class Main {
 
 		//Lancement de la Brique
 		
-		Controler controler = new Controler(cam);
+		Controler controler = new Controler(cam, true);
 		try{
 			controler.start();
 		}catch(Throwable e){
