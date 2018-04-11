@@ -34,7 +34,9 @@ public class Controler {
 	protected VisionSensor vision = null;
 	protected Screen screen = null;
 	protected InputHandler input = null;
-	protected ActionsGiver actionsGiver = null;
+	protected Camera camera = null;
+	protected ActionsGiver actionGiver = null;
+
 	public static boolean seekLeft;
 	private IntPoint myPos;
 	private IntPoint dest;
@@ -59,7 +61,8 @@ public class Controler {
 		vision = new VisionSensor();
 		screen = new Screen();
 		FactoryAG fag = new FactoryAG(false);
-		actionsGiver = fag.createActionGiver(cam);
+		actionGiver = fag.createActionGiver(cam);
+		camera = cam;
 		input = new InputHandler(screen);
 		motors.add(propulsion);
 		motors.add(graber);
@@ -98,7 +101,7 @@ public class Controler {
 				seekLeft = false;
 			}
 
-			actionsGiver.setSeekLeft(seekLeft);
+			camera.setSeekLeft(seekLeft);
 			screen.clearPrintln();
 			screen.clearDraw();
 			screen.drawText("Position", "< Gauche", "OK Milieu", "> Droite");
@@ -308,8 +311,23 @@ public class Controler {
 
 			// si le robot doit ramener le palet
 			if (vaPoser) {
-				avoidObstruct();
-				return true;
+				boolean obsturct = false;
+				if (firstPass) {
+					ArrayList<IntPoint> points = camera.getPaletsPositions();
+					for (IntPoint point : points) {
+						if (point.getX() == myPos.getX() && point.getY() > myPos.getY()) {
+							obsturct = true;
+							break;
+						}
+					}
+				}
+				// si le chemin vers le camp adverse est obstru�
+				if (obsturct) {
+					avoidObstruct();
+					return true;
+				} else {
+					propulsion.run(true);
+				}
 				// si le robot va chercher un palet
 			} else {
 				propulsion.runFor(ttl, true);
@@ -412,19 +430,15 @@ public class Controler {
 	private void mainLoop() {
 		boolean run = true;
 		boolean pasDeProbleme = true;
-		propulsion.seDegreeToNorth(0);
 
 		screen.clearPrintln();
 		screen.clearDraw();
-		screen.drawText("Preparation !!");
-		ArrayList<String> goals = actionsGiver.findGoals(this.myPos);
+		screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
+		ArrayList<String> goals = actionGiver.findGoals(myPos);
 		
-		screen.clearPrintln();
-		screen.clearDraw();
-		screen.drawText("Let's go ?");
-		input.waitAny();
-		
+		propulsion.seDegreeToNorth(0);
 		while (run) {
+
 			if (goals == null)
 				run = false;
 			else {
@@ -438,7 +452,7 @@ public class Controler {
 				screen.clearPrintln();
 				screen.clearDraw();
 				screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
-				goals = actionsGiver.findGoals(this.myPos);
+				goals = actionGiver.findGoals(myPos);
 			}
 		}
 	}
