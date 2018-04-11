@@ -107,9 +107,9 @@ public class Controler {
 			screen.drawText("Position", "< Gauche", "OK Milieu", "> Droite");
 			int btn = input.waitAny();
 			if (btn == Button.ID_LEFT) {
-				myPos = new IntPoint(3, 0);
-			} else if (btn == Button.ID_RIGHT) {
 				myPos = new IntPoint(9, 0);
+			} else if (btn == Button.ID_RIGHT) {
+				myPos = new IntPoint(3, 0);
 			} else if (btn == Button.ID_ENTER) {
 				myPos = new IntPoint(6, 0);
 			}
