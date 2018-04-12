@@ -257,7 +257,8 @@ public class Controler {
 			 * propulsion.rotate(180, true, false); while (propulsion.isRunning()) {
 			 * propulsion.checkState(); }
 			 */
-
+			//repositionnement();
+			
 			vaPoser = false;
 			firstPass = false;
 			return true;
@@ -281,34 +282,35 @@ public class Controler {
 			// System.out.println("my orientation: " + myOrientation);
 
 			int angle = degrees + myOrientation;
-			angle = angle % 360;
-			if (angle > 180)
-				angle -= 360;
+			//angle = angle % 360;
+			//if (angle > 180)
+				//angle -= 360;
 
 			if (!vaPoser && !firstPass) {
-				if (x0 > x1) {
-					angle = -angle;
+				if (x1 > x0) {
+					//angle = -angle;
 					aGauche = true;
 				} else {
 					aGauche = false;
 				}
-			} else if (vaPoser && !firstPass && aGauche) {
-				angle = Math.abs(angle);
+			} else if (vaPoser && !firstPass) {
+				aGauche = !aGauche;
 			}
+			if(vaPoser) angle +=2;
 			// System.out.println("angle corrected: " + angle);
 
-			boolean left = false;
-			if (angle < 0)
-				left = true;
+			//boolean left = false;
+			//if (angle < 0)
+				//left = true;
 
-			propulsion.rotate(Math.abs(angle)+2, left, true);
+			propulsion.rotate(Math.abs(angle), aGauche, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
 
 			distance = distance(myPos, dest);
 			int ttl = (int) (timeForOneUnit * distance);
-			System.out.println("distance: " + distance + " | timeByUnit: " + timeForOneUnit + " | ttl: " + ttl);
+			//System.out.println("distance: " + distance + " | timeByUnit: " + timeForOneUnit + " | ttl: " + ttl);
 			start = System.currentTimeMillis();
 
 			// si le robot doit ramener le palet
@@ -334,8 +336,14 @@ public class Controler {
 			} else {
 				propulsion.runFor(ttl, true);
 			}
-			myPos = dest;
 
+			int colorToFind = getCouleurATrouve(dest.getX());
+			int compteurNoir = 0;
+			boolean doitCroiser = myPos.getX() != dest.getX();
+			boolean nePasCompterPremierNoir = dest.getY()>6?true:false;
+			
+			myPos = dest;
+			
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 				// conditions d'arret des roues
@@ -343,12 +351,127 @@ public class Controler {
 					touche = true;
 					propulsion.stopMoving();
 					return true;
+				} else if(!vaPoser && doitCroiser && !firstPass && (color.getCurrentColor() == colorToFind && !nePasCompterPremierNoir
+							|| nePasCompterPremierNoir && compteurNoir==2 && color.getCurrentColor() == Color.BLACK)) {
+					propulsion.stopMoving();
+					propulsion.runFor(200, true);
+					while (propulsion.isRunning()) {
+						propulsion.checkState();
+					}
+					int resteAngle = 180-angle;
+					propulsion.rotate(resteAngle, aGauche, true);
+					while (propulsion.isRunning()) {
+						propulsion.checkState();
+					}
+					propulsion.runFor(500,true);
+				} else if(!vaPoser && doitCroiser && !firstPass && nePasCompterPremierNoir && compteurNoir==0 && color.getCurrentColor() == Color.BLACK) {
+					compteurNoir++;
+				} else if(!vaPoser && doitCroiser && !firstPass && nePasCompterPremierNoir && compteurNoir==1 && color.getCurrentColor() == Color.GRAY) {
+					compteurNoir++;
 				}
 			}
 			return true;
 		default:
 			return false;
 		}
+	}
+	
+	private int getCouleurATrouve(int x) {
+		int colors[] = {Color.YELLOW, Color.BLACK, Color.RED};
+		//si on est parti à droite de la camera, inverse jaune et rouge
+		if(!seekLeft) {
+			colors[0] = Color.RED;
+			colors[2] = Color.YELLOW;
+		}
+		//determine la couleur qu'on doit croiser
+		return colors[(x/3)-1];
+	}
+	
+	
+	/**
+	 *  repositionne le robot sur le croisement de ligne blanche et la ligne de couleur correspondante a sa position en x 
+	 *  ne fonctionne pas comme souhaite
+	 **/
+	private void repositionnement() {
+		//se positionne face a la ligne blanche
+		propulsion.rotate(R2D2Constants.FULL_CIRCLE, true, false);
+		while (propulsion.isRunning()) {
+			propulsion.checkState();
+			if(color.getCurrentColor() == Color.WHITE) {
+				propulsion.stopMoving();
+				System.out.println("face a la ligne blanche");
+			}
+		}
+		
+		boolean positionOk = false;
+		//determine la couleur qu'on doit croiser
+		int colorToFind = getCouleurATrouve(myPos.getX()/3);
+		System.out.println("colorToFind: "+colorToFind);
+		//valeurs d'angles acceptees
+		int minAngleAccepted = 85;
+		int maxAngleAccepted = 95;
+		while(!positionOk) {
+			//rotation a gauche jusqu'à trouver la ligne de couleur 
+			propulsion.rotate(R2D2Constants.FULL_CIRCLE, true, false);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+				int currentColor = color.getCurrentColor();
+				if(currentColor != Color.GRAY) {			
+					if(currentColor == colorToFind) {
+						System.out.print("trouve la bonne couleur: ");
+						if(currentColor == Color.YELLOW) System.out.println("JAUNE");
+						else if(currentColor == Color.BLACK) System.out.println("NOIR");
+						else if(currentColor == Color.RED) System.out.println("ROUGE");
+						double rotation = (propulsion.getRotateToNorth() - 90);
+						//si l'angle est satisfaisant, on sort
+						if(rotation >= minAngleAccepted && rotation <= maxAngleAccepted) {
+							System.out.println("angle acceptable: "+rotation+"°");
+							positionOk = true;
+							propulsion.stopMoving();
+						}
+						//sinon on ajuste sa position et on recommence
+						else {
+							System.out.println("angle pas acceptable: "+rotation+"°");
+							//on se re-aligne sur la ligne blanche
+							propulsion.rotate(R2D2Constants.FULL_CIRCLE, false, false);
+							while (propulsion.isRunning()) {
+								propulsion.checkState();
+								if(color.getCurrentColor() == Color.WHITE) {
+									propulsion.stopMoving();
+									System.out.println("face a la ligne blanche");
+								}
+							}
+							//rotation trop petite = trop a droite
+							if(rotation < minAngleAccepted) {
+								System.out.println("recule face a la ligne blanche");
+								propulsion.runFor(150, false);
+								while (propulsion.isRunning()) {
+									propulsion.checkState();
+								}
+							} 
+							//rotation trop grande (>95) = trop a gauche
+							else {
+								System.out.println("avance sur la ligne blanche");
+								propulsion.runFor(150, true);
+								while (propulsion.isRunning()) {
+									propulsion.checkState();
+								}
+							}	
+						}
+					}
+				}
+				
+			}
+			if(!positionOk) {
+				System.out.println("aucune couleur trouve, je m'avance un peu");
+				propulsion.runFor(500, true);
+				while (propulsion.isRunning()) {
+					propulsion.checkState();
+				}
+			}
+		}
+		System.out.println("repositionnement final");
+		propulsion.rotate(R2D2Constants.HALF_CIRCLE, false, false);
 	}
 
 	/**
@@ -384,19 +507,56 @@ public class Controler {
 			propulsion.checkState();
 		}
 
-		//avance tout droit jusqu'ï¿½ trouver la ligne blanche 
+		boolean croise = false;
+		int compteurNoir = 0;
+		//avance tout droit jusqu'a croiser la ligne voulue
 		propulsion.run(true);
 		while (propulsion.isRunning()) {
 			propulsion.checkState();
-			if (color.getCurrentColor() == Color.WHITE) {
+			int col = color.getCurrentColor();
+			int colorToFind = getCouleurATrouve(dest.getX());
+			//si on doit croiser une ligne jaune ou rouge
+			if(!croise && col == colorToFind && colorToFind != Color.BLACK) {
+				croise = true;
+				propulsion.stopMoving();
+				propulsion.runFor(200, true);
+				while (propulsion.isRunning()) {
+					propulsion.checkState();
+				}
+				propulsion.rotate(Math.abs(angle)+2, !left, true);
+				while (propulsion.isRunning()) {
+					propulsion.checkState();
+				}
+				propulsion.run(true);
+			//si on doit croiser une ligne noir
+			} else if(!croise && compteurNoir==0 && col == Color.BLACK) {
+				compteurNoir++;
+			} else if(!croise && compteurNoir==1 && col == Color.GRAY) {
+				compteurNoir++;
+			} else if(!croise && compteurNoir==2 && col == Color.BLACK) {
+				croise = true;
+				propulsion.stopMoving();
+				propulsion.runFor(200, true);
+				while (propulsion.isRunning()) {
+					propulsion.checkState();
+				}
+				propulsion.rotate(Math.abs(angle)+2, !left, true);
+				while (propulsion.isRunning()) {
+					propulsion.checkState();
+				}
+				propulsion.run(true);
+			//pour rentrer au camp adverse
+			} else if (col == Color.WHITE) {
 				propulsion.stopMoving();
 			}
 		}
 		
-		//se repositionne face au camp adverse
-		propulsion.rotate(Math.abs(angle)+2, !left, true);
-		while (propulsion.isRunning()) {
-			propulsion.checkState();
+		if(!croise) {
+			//se repositionne face au camp adverse
+			propulsion.rotate(Math.abs(angle)+2, !left, true);
+			while (propulsion.isRunning()) {
+				propulsion.checkState();
+			}
 		}
 
 		//mets ï¿½ jour la position actuelle
