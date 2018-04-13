@@ -8,7 +8,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		Camera cam = new Camera();
-
+		
 		// Lancement de la camera 1er boolean pour la calibration, 2nd true si le server est pour un robot
 		Server s = new Server(cam, false, true);
 		s.start();

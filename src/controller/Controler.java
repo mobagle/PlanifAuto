@@ -296,7 +296,7 @@ public class Controler {
 			} else if (vaPoser && !firstPass) {
 				aGauche = !aGauche;
 			}
-			if(vaPoser) angle +=2;
+			//if(vaPoser) angle +=2;
 			// System.out.println("angle corrected: " + angle);
 
 			//boolean left = false;
@@ -341,6 +341,7 @@ public class Controler {
 			int compteurNoir = 0;
 			boolean doitCroiser = myPos.getX() != dest.getX();
 			boolean nePasCompterPremierNoir = dest.getY()>6?true:false;
+			boolean aCroise = false;
 			
 			myPos = dest;
 			
@@ -350,6 +351,12 @@ public class Controler {
 				if ((!vaPoser && pression.isPressed()) || (vaPoser && color.getCurrentColor() == Color.WHITE)) {
 					touche = true;
 					propulsion.stopMoving();
+					if(!aCroise) {
+						propulsion.runFor(200, true);
+						while (propulsion.isRunning()) {
+							propulsion.checkState();
+						}
+					}
 					return true;
 				} else if(!vaPoser && doitCroiser && !firstPass && (color.getCurrentColor() == colorToFind && !nePasCompterPremierNoir
 							|| nePasCompterPremierNoir && compteurNoir==2 && color.getCurrentColor() == Color.BLACK)) {
@@ -363,6 +370,7 @@ public class Controler {
 					while (propulsion.isRunning()) {
 						propulsion.checkState();
 					}
+					aCroise = true;
 					propulsion.runFor(500,true);
 				} else if(!vaPoser && doitCroiser && !firstPass && nePasCompterPremierNoir && compteurNoir==0 && color.getCurrentColor() == Color.BLACK) {
 					compteurNoir++;
@@ -378,7 +386,7 @@ public class Controler {
 	
 	private int getCouleurATrouve(int x) {
 		int colors[] = {Color.YELLOW, Color.BLACK, Color.RED};
-		//si on est parti à droite de la camera, inverse jaune et rouge
+		//si on est parti ï¿½ droite de la camera, inverse jaune et rouge
 		if(!seekLeft) {
 			colors[0] = Color.RED;
 			colors[2] = Color.YELLOW;
@@ -411,7 +419,7 @@ public class Controler {
 		int minAngleAccepted = 85;
 		int maxAngleAccepted = 95;
 		while(!positionOk) {
-			//rotation a gauche jusqu'à trouver la ligne de couleur 
+			//rotation a gauche jusqu'ï¿½ trouver la ligne de couleur 
 			propulsion.rotate(R2D2Constants.FULL_CIRCLE, true, false);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
@@ -425,13 +433,13 @@ public class Controler {
 						double rotation = (propulsion.getRotateToNorth() - 90);
 						//si l'angle est satisfaisant, on sort
 						if(rotation >= minAngleAccepted && rotation <= maxAngleAccepted) {
-							System.out.println("angle acceptable: "+rotation+"°");
+							System.out.println("angle acceptable: "+rotation+"ï¿½");
 							positionOk = true;
 							propulsion.stopMoving();
 						}
 						//sinon on ajuste sa position et on recommence
 						else {
-							System.out.println("angle pas acceptable: "+rotation+"°");
+							System.out.println("angle pas acceptable: "+rotation+"ï¿½");
 							//on se re-aligne sur la ligne blanche
 							propulsion.rotate(R2D2Constants.FULL_CIRCLE, false, false);
 							while (propulsion.isRunning()) {
@@ -621,7 +629,9 @@ public class Controler {
 				screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
 				goals = actionGiver.findGoals(myPos);
 				if (ag) {
-					actionGiver = (ActionsGiver) (((AGExpert)actionGiver).clone());
+					
+					AGExpert age = ((AGExpert)actionGiver).clone();
+					actionGiver = age;
 					((AGExpert) actionGiver).start();
 				}
 			}
