@@ -74,6 +74,7 @@ public class Server extends Thread{
 	 */
 	@Override
 	public void run() {
+		// 2 serveurs en fonction de l'utilisation
 		if (isarobot) serverRobot();
 		else serverMecano();		
 	}
@@ -106,6 +107,7 @@ public class Server extends Thread{
 		Traducteur t = new Traducteur();
 		t.setSeekLeft(true);	// a gauche de la camera
 		//t.setSeekLeft(false);	// a droite de la camera
+		// Affichage
 		System.out.println("Reception des points :");
 		for (IntPoint ip : t.traduire(packet)) System.out.println(" - "+ip);
 	}

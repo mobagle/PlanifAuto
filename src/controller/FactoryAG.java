@@ -10,6 +10,7 @@ public class FactoryAG {
 		expert = rapide;
 	}
 	
+	// Crée l'actionGiver en fonction du boolean
 	public ActionsGiver createActionGiver(Camera cam) {
 		if (expert) return new AGExpert(cam);
 		else return new AGNaif(cam);

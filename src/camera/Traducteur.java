@@ -28,7 +28,6 @@ public class Traducteur {
 	
 	public void setSeekLeft(boolean b) {
 		seekLeft = b;
-		//System.out.println("seekLeft : "+seekLeft);
 	}
 	
 	private void recupererCalibrage() {
@@ -84,7 +83,6 @@ public class Traducteur {
 			if (i != 6) {
 				X[i] = moyenne(X[0] + i*2*deltaX, X[12] - (24-(i*2))*deltaX);
 				Y[i] = moyenne(Y[0] + i*2*deltaY, Y[12] - (24-(i*2))*deltaY);
-				System.out.println("X["+i+"] = "+X[i]+" ,Y["+i+"] = "+Y[i]);
 			} else {
 				if (X[i] > X[i-1] + 2.5*deltaX) System.out.println("TRADUCTEUR : Probleme Calibration de X");
 				if (Y[i] > Y[i-1] + 2.5*deltaY) System.out.println("TRADUCTEUR : Probleme Calibration de Y");
@@ -134,7 +132,7 @@ public class Traducteur {
 	}
 	
 	private int findX(int x) {
-		// Regle un de déformation de la camera
+		// Tolérence supplémentaire pour les 3 valeurs principales
 		if (x > X[9]-(1.5*deltaX) && x <= X[9]+(1.5*deltaX)) return 9;
 		else if (x > X[6]-(1.5*deltaX) && x <= X[6]+(1.5*deltaX)) return 6;
 		else if (x > X[3]-(1.5*deltaX) && x <= X[3]+(1.5*deltaX)) return 3;
@@ -146,7 +144,7 @@ public class Traducteur {
 	}
 
 	private int findY(int y) {
-		// Regle un de déformation de la camera
+		// Tolérence supplémentaire pour les 3 valeurs principales
 		if (y > Y[9]-(1.5*deltaY) && y <= Y[9]+(1.5*deltaY)) return 9;
 		else if (y > Y[6]-(1.5*deltaY) && y <= Y[6]+(1.5*deltaY)) return 6;
 		else if (y > Y[3]-(1.5*deltaY) && y <= Y[3]+(1.5*deltaY)) return 3;
