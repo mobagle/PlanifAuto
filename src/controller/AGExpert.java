@@ -26,6 +26,7 @@ public class AGExpert extends Thread implements ActionsGiver {
 	}
 	
 	public ArrayList<String> findGoals(IntPoint myPos) {
+		if (res == null) return null;
 		if (!myPos.equals(lastPosition)) { // Le pré calcul est parti d'une mauvaise position, on recalcul
 			position = myPos;
 			lastPosition = null;
@@ -33,7 +34,6 @@ public class AGExpert extends Thread implements ActionsGiver {
 			res = null;
 			run();
 		}
-		if (res == null) return null;
 		return (ArrayList<String>) this.res.clone();
 	}
 
@@ -54,12 +54,15 @@ public class AGExpert extends Thread implements ActionsGiver {
 			
 			// Recherche des action a effectuer
 			res = solver.findActions(position, listPalets);
-			lastPalet = paletTake(res);	// Mise en place de la prochaine recherche
+			
+			// Mise en place de la prochaine recherche
+			lastPalet = paletTake(res);
 			lastPosition = position;
 			position = lastPos(res);
 		}
 	}
-
+	
+	// Supprime le palet de la liste des palet
 	private void enleverPalet(ArrayList<IntPoint> listPalets, IntPoint palet) {
 		for(IntPoint ip : listPalets) {
 			if (ip.equals(palet)) {
@@ -69,6 +72,7 @@ public class AGExpert extends Thread implements ActionsGiver {
 		}
 	}
 
+	// Recupere la position du palet à enlever
 	private IntPoint paletTake(ArrayList<String> res) {
 		for(String act : res) {
 			String[] s = act.split(" ");
@@ -79,6 +83,7 @@ public class AGExpert extends Thread implements ActionsGiver {
 		return null;
 	}
 
+	// Recupere la derniere position du robot
 	private IntPoint lastPos(ArrayList<String> res) {
 		int nbAction = res.size();
 		String act = res.get(nbAction-1);

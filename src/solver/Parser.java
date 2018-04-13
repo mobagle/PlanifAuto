@@ -49,24 +49,6 @@ public class Parser {
 		return s;
 	}
 	
-	/* Remet dans l'ordre des actions à effectuer par le robot */
-	/*public String[] actionDansLOrdre(ArrayList<String> listString, int size) {
-		String[] result = new String[size]; // Modification de sa taille en fonction du nombre d'actions
-		
-		for(String s : listString) {
-			if (getPremierMot(s).equals("Action")) { // Une action est reconnue
-				String[] action = s.split(" ");
-				int num = Integer.parseInt(action[1]);
-				String act = action[3] + " " + action[5].substring(1) + " " + action[6].substring(1);
-				if (!(action[3].equals("lacherpalet") || action[3].equals("prendrepalet"))) { // Une fonction avec 3 arguments
-					act = act + " " + action[7].substring(1);
-				}
-				result[num] = act; // Les actions se remettent dans l'ordre
-			}
-		}
-		return result;
-	}*/
-	
 	/* Modifie les actions
 	 * Si action1 est égale à action2, 
 	 * 	nous partons de la position initiale de l'action1
@@ -169,13 +151,6 @@ public class Parser {
 		for(int i = num; i<size-1; i++) tab[i] = tab[i+1];
 		tab[size-1] = null;
 	}
-
-	/* Recupere le nombre d'action à effectuer */
-	/*public int findNbActions(String a) {
-		String[] str = a.split(" ");
-		int size = str.length;
-		return Integer.parseInt(str[size-1]) +1;
-	}*/
 	
 	/* Recupere le premier mot d'un string, separe par des espaces */
 	public String getPremierMot(String word) {
