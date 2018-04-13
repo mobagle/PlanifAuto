@@ -98,9 +98,9 @@ public class AGExpert extends Thread implements ActionsGiver {
 	
 	public AGExpert clone() {
 		AGExpert age = new AGExpert(this.camera);
-		age.lastPalet = this.lastPalet;
-		age.position = this.position;
-		age.lastPosition = this.lastPosition;
+		age.lastPalet = new IntPoint(lastPalet.getX(), lastPalet.getY());
+		age.position = new IntPoint(position.getX(), position.getY());
+		age.lastPosition = new IntPoint(lastPosition.getX(), lastPosition.getY());
 		return age;
 	}
 }
