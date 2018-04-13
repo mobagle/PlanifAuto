@@ -124,7 +124,7 @@ public class Traducteur {
 	}
 
 	private IntPoint traductionPoint(IntPoint intPoint) {
-		int newX = findX(intPoint.getX()); // -12 Pour que x = 0 soit toujours à notre droite
+		int newX = 12-findX(intPoint.getX()); // -12 Pour que x = 0 soit toujours à notre droite
 		int newY = findY(intPoint.getY());
 		if (!seekLeft && newX!=-1 && newY!=-1) {
 			newX = 12-newX;

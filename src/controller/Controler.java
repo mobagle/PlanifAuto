@@ -95,12 +95,12 @@ public class Controler {
 			}
 			seekLeft = true;
 
-			screen.drawText("Lancer", "Appuyez sur OK si la", "ligne noire est a� gauche", "Appuyez sur tout autre",
+			screen.drawText("Lancer", "Appuyez sur OK si la", "camera est a gauche", "Appuyez sur tout autre",
 					"elle est a droite");
 			if (input.isThisButtonPressed(input.waitAny(), Button.ID_ENTER)) {
-				seekLeft = true;
-			} else {
 				seekLeft = false;
+			} else {
+				seekLeft = true;
 			}
 
 			camera.setSeekLeft(seekLeft);
