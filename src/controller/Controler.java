@@ -78,7 +78,7 @@ public class Controler {
 
 	/**
 	 * Lance le robot. Dans un premier temps, effectue une calibration des capteurs.
-	 * Dans un second temps, lance des tests Dans un troisième temps, démarre la
+	 * Dans un second temps, lance des tests Dans un troisieme temps, demarre la
 	 * boucle principale du robot pour la persycup
 	 * 
 	 * @throws IOException
@@ -165,7 +165,7 @@ public class Controler {
 	}
 
 	/**
-	 * Effectue l'ensemble des actions nécessaires à l'extinction du programme
+	 * Effectue l'ensemble des actions necessaires a� l'extinction du programme
 	 */
 	private void cleanUp() {
 		if (!graber.isOpen()) {
@@ -182,14 +182,14 @@ public class Controler {
 	}
 
 	/**
-	 * Lance les tests du robot, peut être desactivé pour la persy cup
+	 * Lance les tests du robot, peut etre desactive pour la persy cup
 	 */
 	@SuppressWarnings("unused")
 	private void runTests() {
 		SystemTest.grabberTest(this);
 	}
 
-	/** Mets � jour le temps moyen n�cessaire pour avancer d'une unit� */
+	/** Mets a jour le temps moyen necessaire pour avancer d'une "unite" dans notre grille */
 	private void majTimeToRunByUnit(double dist, long time) {
 		System.out.println("Old TimeToRunByUnit: " + timeForOneUnit + " ms | dist: " + dist + " | time: " + time);
 		distanceTot += dist;
@@ -198,23 +198,18 @@ public class Controler {
 		System.out.println("New TimeToRunByUnit: " + timeForOneUnit + " ms");
 	}
 
+	/** execute l'action donnee par l'ActionGiver */
 	private boolean execute(String ac) {
 		// X largeur du terrain, Y longueur
-		// System.out.println(ac);
 		String action[] = ac.split(" ");
 		int x0, x1, y0, y1;
 		for (TImedMotor m : motors)
 			m.checkState();
 		switch (action[0]) {
 		case "prendrepalet":
-			/*
-			 * 
-			 * if(vision.getRaw()[0] <= R2D2Constants.COLLISION_DISTANCE) { // arret des
-			 * roues propulsion.stopMoving(); System.out.println("COLLISION"); return false;
-			 * }
-			 */
-
+			//si le palet n'a pas encore ete touche
 			if (!touche) {
+				//avance encore un peu pour essayer de l'attraper
 				propulsion.runFor(800, true);
 				while (propulsion.isRunning()) {
 					if (pression.isPressed()) {
@@ -224,99 +219,98 @@ public class Controler {
 					propulsion.checkState();
 				}
 			}
-
+			//calcul le temps ecoule depuis le debut du deplacement
 			elapsedTime = System.currentTimeMillis() - start;
+			//mets a jour le temps moyen necessaire pour avancer d'une unite
 			majTimeToRunByUnit(distance, elapsedTime);
+			//ferme les pinces
 			graber.close();
-			// attend la fin de la fermeture des pinces
 			while (graber.isRunning()) {
 				graber.checkState();
 			}
+			//passe dans l'etat "vaPoser"
 			vaPoser = true;
 			return true;
 
 		case "lacherpalet":
-
+			//est positionne sur la ligne blanche face a l'adversaire
+			//avance un peu
 			propulsion.runFor(400, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
-			// ouvre les pinces
+			//lache le palet
 			graber.open();
-			// attend la fin de l'ouverture des pinces
 			while (graber.isRunning()) {
 				graber.checkState();
 			}
-
-			// recule apres avoir lacher le palet
+			//recule apres avoir lacher le palet
 			propulsion.runFor(400, false);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
-			/*
-			 * propulsion.rotate(180, true, false); while (propulsion.isRunning()) {
-			 * propulsion.checkState(); }
-			 */
+			
+			//a cette etape on voulait effectue un repositionnement du robot pour repartir exactement du bon endroit
 			//repositionnement();
 			
+			//sort de l'etat "vaPoser"
 			vaPoser = false;
+			//a fini de ramener le tout premier palet
 			firstPass = false;
 			return true;
 
 		case "deplacement":
+			//remet touche a faux pour le prochain ramassage
 			touche = false;
-			// initialisation des points
+			//recuperation des coordonnees des points de depart et d'arrivee pour le deplacement
 			x0 = Integer.valueOf(action[1]);
 			y0 = Integer.valueOf(action[2]);
 			x1 = Integer.valueOf(action[3]);
 			y1 = Integer.valueOf(action[4]);
 			myPos = new IntPoint(x0, y0);
 			dest = new IntPoint(x1, y1);
+			
+			//definition d'un point "tout au nord" pour les calculs d'angle"
 			IntPoint north = new IntPoint(x0, 16);
-			// rotation
-
+			//calcul de la valeur absolue de l'angle forme par arrivee, depart, nord
 			int degrees = angle(myPos, dest, north);
-			// System.out.println("computed angle: " + degrees);
-
+			//recupere l'orientation actuelle du robot
 			int myOrientation = (int) propulsion.getRotateToNorth();
-			// System.out.println("my orientation: " + myOrientation);
-
+			//calcul la rotation a effectuer
 			int angle = degrees + myOrientation;
-			//angle = angle % 360;
-			//if (angle > 180)
-				//angle -= 360;
-
+			
+			//si on va chercher un palet et que ce n'est pas le premier palet
 			if (!vaPoser && !firstPass) {
+				//determine le sens de la rotation
 				if (x1 > x0) {
-					//angle = -angle;
 					aGauche = true;
 				} else {
 					aGauche = false;
 				}
+			//si on va poser un palet, regle le sens de rotation sur l'inverse du sens qu'on avait pour prendre le palet
 			} else if (vaPoser && !firstPass) {
 				aGauche = !aGauche;
 			}
-			//if(vaPoser) angle +=2;
-			// System.out.println("angle corrected: " + angle);
 
-			//boolean left = false;
-			//if (angle < 0)
-				//left = true;
-
+			//effectue la rotation
 			propulsion.rotate(Math.abs(angle), aGauche, true);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 			}
-
+			
+			//calcul la distance en ligne droite a parcourir pour atteindre la destination
 			distance = distance(myPos, dest);
+			//defini un temps de deplacement maximal dans le cas ou un rate le palet
 			int ttl = (int) (timeForOneUnit * distance);
-			//System.out.println("distance: " + distance + " | timeByUnit: " + timeForOneUnit + " | ttl: " + ttl);
+			//lance un timer pour savoir le temps ecoule
 			start = System.currentTimeMillis();
 
 			// si le robot doit ramener le palet
 			if (vaPoser) {
 				boolean obsturct = false;
+				//si c'est le tout premier palet
 				if (firstPass) {
+					//verifie si le chemin est obstrue
 					ArrayList<IntPoint> points = camera.getPaletsPositions();
 					for (IntPoint point : points) {
 						if (point.getX() == myPos.getX() && point.getY() > myPos.getY()) {
@@ -325,39 +319,48 @@ public class Controler {
 						}
 					}
 				}
-				// si le chemin vers le camp adverse est obstru�
+				// si le chemin vers le camp adverse est obstrue
 				if (obsturct) {
+					//effectue un deplacement particulier pour eviter les autres palets
 					avoidObstruct();
 					return true;
+				//avance tout droit
 				} else {
 					propulsion.run(true);
 				}
-				// si le robot va chercher un palet
+			// si le robot va chercher un palet, avance tout droit pendant un temps max
 			} else {
 				propulsion.runFor(ttl, true);
 			}
-
+			//couleur de l'axe des X qu'on doit atteindre
 			int colorToFind = getCouleurATrouve(dest.getX());
+			//variables pour le cas particulier des lignes noir, dans certains cas on peut croiser deux lignes noir et il faut donc ignorer la premiere
 			int compteurNoir = 0;
 			boolean doitCroiser = myPos.getX() != dest.getX();
 			boolean nePasCompterPremierNoir = dest.getY()>6?true:false;
+			//booleen pour savoir si on a deja croise la ligne de couleur qu'on doit atteindre
 			boolean aCroise = false;
 			
-			myPos = dest;
-			
+			//tant que le robot se deplace
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
-				// conditions d'arret des roues
+				// conditions d'arret des roues et de sortie de la boucle:
+				//si on va chercher un palet et qu'on en touche un OU si on va poser un palet et qu'on croise la ligne blanche
 				if ((!vaPoser && pression.isPressed()) || (vaPoser && color.getCurrentColor() == Color.WHITE)) {
 					touche = true;
+					//s'arrete
 					propulsion.stopMoving();
-					if(!aCroise) {
+					//si le robot a attrape un palet et qu'il n'a pas encore croise la ligne avance un tout petit peu pour se centrer sur cette ligne
+					if(!vaPoser && !aCroise) {
 						propulsion.runFor(200, true);
 						while (propulsion.isRunning()) {
 							propulsion.checkState();
 						}
 					}
+					//mets a jour ma position actuelle
+					myPos = dest;
 					return true;
+				//si le robot croise la ligne de couleur qu'il ne doit pas franchir, se repositionne dans l'axe de cette ligne pour chercher le palet
 				} else if(!vaPoser && doitCroiser && !firstPass && (color.getCurrentColor() == colorToFind && !nePasCompterPremierNoir
 							|| nePasCompterPremierNoir && compteurNoir==2 && color.getCurrentColor() == Color.BLACK)) {
 					propulsion.stopMoving();
@@ -384,9 +387,10 @@ public class Controler {
 		}
 	}
 	
+	/** retourne la valeur de la couleur correspondant au X donne en parametre */
 	private int getCouleurATrouve(int x) {
 		int colors[] = {Color.YELLOW, Color.BLACK, Color.RED};
-		//si on est parti � droite de la camera, inverse jaune et rouge
+		//si on est parti a droite de la camera, inverse jaune et rouge
 		if(!seekLeft) {
 			colors[0] = Color.RED;
 			colors[2] = Color.YELLOW;
@@ -398,7 +402,7 @@ public class Controler {
 	
 	/**
 	 *  repositionne le robot sur le croisement de ligne blanche et la ligne de couleur correspondante a sa position en x 
-	 *  ne fonctionne pas comme souhaite
+	 *  /!\ n'est pas utilise car ne fonctionne pas comme souhaite a cause de la courte distance entre le centre des roues et le detecteur de couleurs
 	 **/
 	private void repositionnement() {
 		//se positionne face a la ligne blanche
@@ -407,33 +411,30 @@ public class Controler {
 			propulsion.checkState();
 			if(color.getCurrentColor() == Color.WHITE) {
 				propulsion.stopMoving();
-				System.out.println("face a la ligne blanche");
 			}
 		}
 		
 		boolean positionOk = false;
 		//determine la couleur qu'on doit croiser
 		int colorToFind = getCouleurATrouve(myPos.getX()/3);
-		System.out.println("colorToFind: "+colorToFind);
 		//valeurs d'angles acceptees
 		int minAngleAccepted = 85;
 		int maxAngleAccepted = 95;
 		while(!positionOk) {
-			//rotation a gauche jusqu'� trouver la ligne de couleur 
+			//rotation a gauche jusqu'a trouver la ligne de couleur 
 			propulsion.rotate(R2D2Constants.FULL_CIRCLE, true, false);
 			while (propulsion.isRunning()) {
 				propulsion.checkState();
 				int currentColor = color.getCurrentColor();
 				if(currentColor != Color.GRAY) {			
 					if(currentColor == colorToFind) {
-						System.out.print("trouve la bonne couleur: ");
+						//trouve la bonne couleur
 						if(currentColor == Color.YELLOW) System.out.println("JAUNE");
 						else if(currentColor == Color.BLACK) System.out.println("NOIR");
 						else if(currentColor == Color.RED) System.out.println("ROUGE");
 						double rotation = (propulsion.getRotateToNorth() - 90);
 						//si l'angle est satisfaisant, on sort
 						if(rotation >= minAngleAccepted && rotation <= maxAngleAccepted) {
-							System.out.println("angle acceptable: "+rotation+"�");
 							positionOk = true;
 							propulsion.stopMoving();
 						}
@@ -446,12 +447,12 @@ public class Controler {
 								propulsion.checkState();
 								if(color.getCurrentColor() == Color.WHITE) {
 									propulsion.stopMoving();
-									System.out.println("face a la ligne blanche");
+									//face a la ligne blanche
 								}
 							}
 							//rotation trop petite = trop a droite
 							if(rotation < minAngleAccepted) {
-								System.out.println("recule face a la ligne blanche");
+								//recule face a la ligne blanche
 								propulsion.runFor(150, false);
 								while (propulsion.isRunning()) {
 									propulsion.checkState();
@@ -459,7 +460,7 @@ public class Controler {
 							} 
 							//rotation trop grande (>95) = trop a gauche
 							else {
-								System.out.println("avance sur la ligne blanche");
+								//avance sur la ligne blanche
 								propulsion.runFor(150, true);
 								while (propulsion.isRunning()) {
 									propulsion.checkState();
@@ -471,14 +472,14 @@ public class Controler {
 				
 			}
 			if(!positionOk) {
-				System.out.println("aucune couleur trouve, je m'avance un peu");
+				//aucune couleur trouve, je m'avance un peu
 				propulsion.runFor(500, true);
 				while (propulsion.isRunning()) {
 					propulsion.checkState();
 				}
 			}
 		}
-		System.out.println("repositionnement final");
+		//repositionnement final
 		propulsion.rotate(R2D2Constants.HALF_CIRCLE, false, false);
 	}
 
@@ -509,7 +510,7 @@ public class Controler {
 		if (angle < 0)
 			left = true;
 
-		//ex�cute une roation pour se positionner face � sa destination
+		//execute une roation pour se positionner face a sa destination
 		propulsion.rotate(Math.abs(angle)+2, left, true);
 		while (propulsion.isRunning()) {
 			propulsion.checkState();
@@ -567,7 +568,7 @@ public class Controler {
 			}
 		}
 
-		//mets � jour la position actuelle
+		//mets a jour la position actuelle
 		myPos = dest;
 
 	}
@@ -587,7 +588,7 @@ public class Controler {
 				Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() * etirementY - p1.getY() * etirementY, 2));
 	}
 
-	/** retourne l'angle en degrees en p1 form� par les points p2 et p3 */
+	/** retourne l'angle en degrees en p1 forme par les points p2 et p3 */
 	private int angle(IntPoint p1, IntPoint p2, IntPoint p3) {
 		double ab = distance(p1, p2);
 		double ac = distance(p1, p3);
@@ -597,6 +598,7 @@ public class Controler {
 		return (int) Math.round(degree);
 	}
 
+	/** boucle d'execution principale */
 	private void mainLoop() {
 		boolean run = true;
 		boolean pasDeProbleme = true;
@@ -612,11 +614,12 @@ public class Controler {
 		input.waitAny();
 
 		propulsion.seDegreeToNorth(0);
+		//tant qu'il y a une action a executer
 		while (run) {
-
 			if (goals == null)
 				run = false;
 			else {
+				//execute les differentes actions donnees par l'action giver
 				for (String goal : goals) {
 					screen.drawText("Action", goal);
 					System.out.println(goal);
@@ -626,10 +629,11 @@ public class Controler {
 				}
 				screen.clearPrintln();
 				screen.clearDraw();
+				//reflechi a son prochain coup
 				screen.drawText("Reflexion", "Calcul de l'itineraire", "en cours");
 				goals = actionGiver.findGoals(myPos);
+				//si on est en mode thread, calcul le coup d'apres
 				if (ag) {
-					
 					AGExpert age = ((AGExpert)actionGiver).clone();
 					actionGiver = age;
 					((AGExpert) actionGiver).start();
