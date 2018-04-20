@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.spi.NumberFormatProvider;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -165,7 +166,7 @@ public class Controler {
 	}
 
 	/**
-	 * Effectue l'ensemble des actions necessaires a� l'extinction du programme
+	 * Effectue l'ensemble des actions necessaires a� l'extinction du programme
 	 */
 	private void cleanUp() {
 		if (!graber.isOpen()) {
@@ -198,7 +199,153 @@ public class Controler {
 		System.out.println("New TimeToRunByUnit: " + timeForOneUnit + " ms");
 	}
 
+	/******************************************************************************************************************************/
+	public enum NumRecherche { Premiere, Normal, Fin; }
+	NumRecherche numRecherche = NumRecherche.Premiere;
+	
+	int nbPaletAChercher = 6; // Nombre de palet à aller chercher avant de passer en mode furtif
+	
 	/** execute l'action donnee par l'ActionGiver */
+	private boolean execute(ArrayList<String> actions) {
+		if (numRecherche == NumRecherche.Premiere) {
+			execPremiereAction(actions);
+			numRecherche = NumRecherche.Normal;
+		} else if (numRecherche == NumRecherche.Normal) {
+			execNormalAction(actions);
+			if (nbPaletAChercher != 0) nbPaletAChercher --;
+			else numRecherche = NumRecherche.Fin;
+		} else if (numRecherche == NumRecherche.Fin) {
+			execFinAction(actions);
+		}
+		return true;
+	}
+
+	private void execPremiereAction(ArrayList<String> actions) {
+		int x0, x1, y0, y1;
+
+		for (String ac : actions) {
+			String action[] = ac.split(" ");
+			switch (action[0]) {
+					case "prendrepalet":
+						break;
+					case "lacherpalet":
+						lacherPalet();
+						break;
+					case "deplacement":
+						//recuperation des coordonnees des points de depart et d'arrivee pour le deplacement
+						x0 = Integer.valueOf(action[1]);
+						y0 = Integer.valueOf(action[2]);
+						x1 = Integer.valueOf(action[3]);
+						y1 = Integer.valueOf(action[4]);
+						myPos = new IntPoint(x0, y0);
+						dest = new IntPoint(x1, y1);
+						
+						//definition d'un point "tout au nord" pour les calculs d'angle"
+						IntPoint north = new IntPoint(x0, 16);
+						//calcul de la valeur absolue de l'angle forme par arrivee, depart, nord
+						int degrees = angle(myPos, dest, north);
+						//recupere l'orientation actuelle du robot
+						int myOrientation = (int) propulsion.getRotateToNorth();
+						//calcul la rotation a effectuer
+						int angle = degrees + myOrientation;
+						
+						if (angle == 0); else if(angle != 0);
+			}
+		}
+	}
+
+	private void execNormalAction(ArrayList<String> actions) {
+		int x0, x1, y0, y1;
+
+		for (String ac : actions) {
+			String action[] = ac.split(" ");
+			switch (action[0]) {
+					case "prendrepalet":
+						break;
+					case "lacherpalet":
+						lacherPalet();
+						break;
+					case "deplacement":
+						//recuperation des coordonnees des points de depart et d'arrivee pour le deplacement
+						x0 = Integer.valueOf(action[1]);
+						y0 = Integer.valueOf(action[2]);
+						x1 = Integer.valueOf(action[3]);
+						y1 = Integer.valueOf(action[4]);
+						myPos = new IntPoint(x0, y0);
+						dest = new IntPoint(x1, y1);
+						
+						//definition d'un point "tout au nord" pour les calculs d'angle"
+						IntPoint north = new IntPoint(x0, 16);
+						//calcul de la valeur absolue de l'angle forme par arrivee, depart, nord
+						int degrees = angle(myPos, dest, north);
+						//recupere l'orientation actuelle du robot
+						int myOrientation = (int) propulsion.getRotateToNorth();
+						//calcul la rotation a effectuer
+						int angle = degrees + myOrientation;
+						
+						if (angle == 0); else if(angle != 0);
+			}
+		}		
+	}
+
+	/* Mode de recherche furtif en find de partie */
+	private void execFinAction(ArrayList<String> actions) {
+		int x0, x1, y0, y1;
+
+		for (String ac : actions) {
+			String action[] = ac.split(" ");
+			switch (action[0]) {
+					case "prendrepalet":
+						break;
+					case "lacherpalet":
+						lacherPalet();
+						break;
+					case "deplacement":
+						//recuperation des coordonnees des points de depart et d'arrivee pour le deplacement
+						x0 = Integer.valueOf(action[1]);
+						y0 = Integer.valueOf(action[2]);
+						x1 = Integer.valueOf(action[3]);
+						y1 = Integer.valueOf(action[4]);
+						myPos = new IntPoint(x0, y0);
+						dest = new IntPoint(x1, y1);
+						
+						//definition d'un point "tout au nord" pour les calculs d'angle"
+						IntPoint north = new IntPoint(x0, 16);
+						//calcul de la valeur absolue de l'angle forme par arrivee, depart, nord
+						int degrees = angle(myPos, dest, north);
+						//recupere l'orientation actuelle du robot
+						int myOrientation = (int) propulsion.getRotateToNorth();
+						//calcul la rotation a effectuer
+						int angle = degrees + myOrientation;
+						
+						if (angle == 0); else if(angle != 0);
+			}
+		}		
+	}
+	
+	/* Fonction qui avance (en diagonale) et se repositionne dans l'axe de la couleur place en paramétre */
+	private void deplacementDiagonale(Color color) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void lacherPalet() {
+		//est positionne sur la ligne blanche face a l'adversaire
+		//avance un peu
+		propulsion.runFor(400, true);
+		while (propulsion.isRunning()) { propulsion.checkState(); }
+		//lache le palet
+		graber.open();
+		while (graber.isRunning()) { graber.checkState(); }
+		//recule apres avoir lacher le palet
+		propulsion.runFor(400, false);
+		while (propulsion.isRunning()) { propulsion.checkState(); }
+		//a cette etape on voulait effectue un repositionnement du robot pour repartir exactement du bon endroit
+		//repositionnement();		
+	}
+	/******************************************************************************************************************************/
+
+	/** execute l'action donnee par l'ActionGiver 
 	private boolean execute(String ac) {
 		// X largeur du terrain, Y longueur
 		String action[] = ac.split(" ");
@@ -620,13 +767,8 @@ public class Controler {
 				run = false;
 			else {
 				//execute les differentes actions donnees par l'action giver
-				for (String goal : goals) {
-					screen.drawText("Action", goal);
-					System.out.println(goal);
-					if (goal != null) {
-						pasDeProbleme = execute(goal);
-					}
-				}
+				pasDeProbleme = execute(goals);
+
 				screen.clearPrintln();
 				screen.clearDraw();
 				//reflechi a son prochain coup
