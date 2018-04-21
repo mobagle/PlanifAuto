@@ -202,24 +202,28 @@ public class Controler {
 	/******************************************************************************************************************************/
 	public enum NumRecherche { Premiere, Normal, Fin; }
 	NumRecherche numRecherche = NumRecherche.Premiere;
-	
 	int nbPaletAChercher = 6; // Nombre de palet à aller chercher avant de passer en mode furtif
+
+	public enum PaletTouche { Yes, No; }
+	PaletTouche paletTouche = PaletTouche.No;
 	
 	/** execute l'action donnee par l'ActionGiver */
 	private boolean execute(ArrayList<String> actions) {
+		paletTouche = PaletTouche.No;
 		if (numRecherche == NumRecherche.Premiere) {
 			execPremiereAction(actions);
 			numRecherche = NumRecherche.Normal;
 		} else if (numRecherche == NumRecherche.Normal) {
 			execNormalAction(actions);
-			if (nbPaletAChercher != 0) nbPaletAChercher --;
+			if (nbPaletAChercher > 0) nbPaletAChercher --;
 			else numRecherche = NumRecherche.Fin;
 		} else if (numRecherche == NumRecherche.Fin) {
 			execFinAction(actions);
 		}
 		return true;
 	}
-
+	
+	/* Execution de la 1er action */
 	private void execPremiereAction(ArrayList<String> actions) {
 		int x0, x1, y0, y1;
 
@@ -227,6 +231,7 @@ public class Controler {
 			String action[] = ac.split(" ");
 			switch (action[0]) {
 					case "prendrepalet":
+						prendrePalet();
 						break;
 					case "lacherpalet":
 						lacherPalet();
@@ -254,6 +259,7 @@ public class Controler {
 		}
 	}
 
+	/* Execution de la autres action */
 	private void execNormalAction(ArrayList<String> actions) {
 		int x0, x1, y0, y1;
 
@@ -261,6 +267,7 @@ public class Controler {
 			String action[] = ac.split(" ");
 			switch (action[0]) {
 					case "prendrepalet":
+						prendrePalet();
 						break;
 					case "lacherpalet":
 						lacherPalet();
@@ -296,6 +303,7 @@ public class Controler {
 			String action[] = ac.split(" ");
 			switch (action[0]) {
 					case "prendrepalet":
+						prendrePalet();
 						break;
 					case "lacherpalet":
 						lacherPalet();
@@ -327,6 +335,30 @@ public class Controler {
 	private void deplacementDiagonale(Color color) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void prendrePalet() {
+		//si le palet n'a pas encore ete touche
+		if (paletTouche == PaletTouche.No) {
+			//avance encore un peu pour essayer de l'attraper
+			propulsion.runFor(800, true);
+			while (propulsion.isRunning()) {
+				if (pression.isPressed()) {
+					propulsion.stopMoving();
+					break;
+				}
+				propulsion.checkState();
+			}
+		}
+		//calcul le temps ecoule depuis le debut du deplacement
+		elapsedTime = System.currentTimeMillis() - start;
+		//mets a jour le temps moyen necessaire pour avancer d'une unite
+		majTimeToRunByUnit(distance, elapsedTime);
+		//ferme les pinces
+		graber.close();
+		while (graber.isRunning()) {
+			graber.checkState();
+		}
 	}
 	
 	private void lacherPalet() {
