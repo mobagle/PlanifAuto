@@ -123,7 +123,7 @@ public class Traducteur {
 
 	private IntPoint traductionPoint(IntPoint intPoint) {
 		int newX = 12-findX(intPoint.getX()); // -12 Pour que x = 0 soit toujours à notre droite
-		int newY = findY(intPoint.getY());
+		int newY = 12-findY(intPoint.getY());
 		if (!seekLeft && newX!=-1 && newY!=-1) {
 			newX = 12-newX;
 			newY = 12-newY;
@@ -145,9 +145,9 @@ public class Traducteur {
 
 	private int findY(int y) {
 		// Tolérence supplémentaire pour les 3 valeurs principales
-		if (y > Y[9]-(1.5*deltaY) && y <= Y[9]+(1.5*deltaY)) return 9;
+		if (y > Y[9]-(1.7*deltaY) && y <= Y[9]+(1.7*deltaY)) return 9;
 		else if (y > Y[6]-(1.5*deltaY) && y <= Y[6]+(1.5*deltaY)) return 6;
-		else if (y > Y[3]-(1.5*deltaY) && y <= Y[3]+(1.5*deltaY)) return 3;
+		else if (y > Y[3]-(1.7*deltaY) && y <= Y[3]+(1.7*deltaY)) return 3;
 		for(int i=0;i<13;i++) {
 			if (y > Y[i]-deltaY && y <= Y[i]+deltaY)
 				return i;
