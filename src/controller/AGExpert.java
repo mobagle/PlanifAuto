@@ -23,11 +23,10 @@ public class AGExpert extends Thread implements ActionsGiver {
 	public AGExpert(Camera c) {
 		camera = c;
 		solver = new Solver();
-		start();
+		lastPosition = new IntPoint(0, 0);
 	}
 	
 	public ArrayList<String> findGoals(IntPoint myPos) {
-		if (res == null) return null;
 		if (!myPos.equals(lastPosition)) { // Le pré calcul est parti d'une mauvaise position, on recalcul
 			position = myPos;
 			lastPosition = null;
