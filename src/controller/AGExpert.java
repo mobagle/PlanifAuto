@@ -23,6 +23,7 @@ public class AGExpert extends Thread implements ActionsGiver {
 	public AGExpert(Camera c) {
 		camera = c;
 		solver = new Solver();
+		start();
 	}
 	
 	public ArrayList<String> findGoals(IntPoint myPos) {
