@@ -616,9 +616,10 @@ public class Controler {
 		propulsion.seDegreeToNorth(0);
 		//tant qu'il y a une action a executer
 		while (run) {
-			if (goals == null)
+			if (goals == null) {
 				run = false;
-			else {
+				screen.drawText("No goals", "fin du run");
+			} else {
 				//execute les differentes actions donnees par l'action giver
 				for (String goal : goals) {
 					screen.drawText("Action", goal);
